@@ -345,3 +345,157 @@ body {
         margin: 60px auto 80px auto;
     }
 }
+
+
+
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background: #9c00cc; 
+    padding: 24px 0;
+    margin: 60px 0;
+    display: flex;
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content; 
+    animation: marqueeMove 18s linear infinite !important;
+}
+
+.marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 60px; 
+    padding-right: 60px;
+    flex-shrink: 0; 
+}
+
+.marquee-item {
+    font-size: 54px; 
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.marquee-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+@keyframes marqueeMove {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+@media (max-width: 768px) {
+    .marquee-container { padding: 16px 0; margin: 40px 0; }
+    .marquee-item { font-size: 32px; }
+    .marquee-logo { width: 32px; height: 32px; }
+    .marquee-group { gap: 40px; padding-right: 40px; }
+}
+
+
+.site-footer {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.01);
+    border-top: 1px solid rgba(255, 255, 255, 0.05); 
+    padding: 60px 8% 30px 8%;
+    margin-top: 80px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-brand {
+    max-width: 360px;
+}
+
+
+.footer-logo-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #ffffff;
+}
+
+.footer-tagline {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 16px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 80px; 
+}
+
+.footer-link-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-link-group h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.footer-link-group a {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-link-group a:hover {
+    color: #c084fc; 
+}
+
+/* Нижняя панель */
+.footer-bottom {
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-credits {
+    font-weight: 500;
+}
+
+
+@media (max-width: 768px) {
+    .site-footer { padding: 40px 6% 20px 6%; margin-top: 40px; }
+    .footer-content { flex-direction: column; gap: 30px; }
+    .footer-links { gap: 40px; flex-wrap: wrap; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+}
