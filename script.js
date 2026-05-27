@@ -36,34 +36,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ========================================================
-    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Кнопки платформ + сервер)
+    
+    });
+
+  // ========================================================
+    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Кнопки платформ + сервер Vercel)
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
-    // Ищем кнопки платформ (Android, iOS...) ТОЛЬКО внутри секции #download
     const platformButtons = document.querySelectorAll('#download .btn-download, #download a, #download button'); 
 
-    // Подключаемся к серверу Node.js
-    const socket = io('https://craneapp-landing-page.vercel.app'); 
+    // ВСТАВЛЯЕМ ТВОЮ ССЫЛКУ ОТ VERCEL СЮДА:
+    const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
-    // Обновляем цифру, когда сервер присылает сигнал
+    // Подключаемся к серверу через сокеты по новому адресу
+    const socket = io(BACKEND_URL); 
+
     socket.on('updateDownloads', (newCount) => {
         if (counterElement) {
             counterElement.innerText = newCount.toLocaleString('ru-RU');
             
-            // Эффект вспышки/толчка цифры
             counterElement.style.transform = 'scale(1.08)';
             counterElement.style.transition = 'transform 0.1s ease';
             setTimeout(() => counterElement.style.transform = 'scale(1)', 150);
         }
     });
 
-    // При клике на кнопки ОС отправляем запрос на сервер (+1 без скролла)
     platformButtons.forEach(button => {
-        // Защита: кнопка не должна быть кнопкой скролла из верхнего меню
         if (!actionScrollButtons.includes(button)) {
             button.addEventListener('click', () => {
-                fetch('http://localhost:3000/api/increment-downloads', {
+                // И здесь тоже меняем localhost на BACKEND_URL
+                fetch(`${BACKEND_URL}/api/increment-downloads`, {
                     method: 'POST'
                 })
                 .then(res => res.json())
@@ -114,5 +116,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initCountdown();
-
-});
