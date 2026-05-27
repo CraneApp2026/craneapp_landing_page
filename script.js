@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const platformButtons = document.querySelectorAll('#download .btn-download, #download a, #download button'); 
 
     // Подключаемся к серверу Node.js
-    const socket = io('http://localhost:3000'); 
+    const socket = io('https://craneapp-landing-page.vercel.app'); 
 
     // Обновляем цифру, когда сервер присылает сигнал
     socket.on('updateDownloads', (newCount) => {
