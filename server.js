@@ -21,7 +21,9 @@ io.on('connection', (socket) => {
     socket.emit('updateDownloads', totalDownloads);
 });
 
-const PORT = 3000;
+// Находим порт, который дает хостинг Vercel, а если его нет (на ПК) — берем 3000
+const PORT = process.env.PORT || 3000;
+
 http.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
+    console.log(`Сервер успешно запущен и слушает порт ${PORT}`);
 });
