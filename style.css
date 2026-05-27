@@ -623,3 +623,38 @@ body {
         font-size: 11px;
     }
 }
+/* ========================================================
+   СТИЛИ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ (Экран меньше 768px)
+   ======================================================== */
+@media (max-width: 768px) {
+    /* 1. Уменьшаем общие отступы и высоту шапки */
+    .site-header, header {
+        padding: 10px 15px !important; /* Делаем шапку узкой */
+        border-radius: 12px !important; /* Чуть уменьшаем скругление углов */
+        margin: 10px !important;        /* Уменьшаем внешние отступы от краев экрана */
+    }
+
+    /* 2. Делаем логотип компактнее */
+    .site-logo, header img {
+        height: 28px !important; /* Уменьшаем высоту логотипа */
+        width: auto;
+    }
+
+    /* 3. Уменьшаем шрифт у названия CraneApp */
+    .brand-name, header h1, header span {
+        font-size: 18px !important; 
+    }
+
+    /* 4. Сжимаем ссылки и кнопку скачивания */
+    .nav-links a {
+        font-size: 13px !important;   /* Чуть меньше шрифт для ссылок */
+        padding: 6px 10px !important; /* Меньше расстояния между ссылками */
+    }
+
+    /* 5. Делаем саму кнопку «Скачать» аккуратной */
+    .site-header .btn-download, header .btn-primary, header button {
+        font-size: 13px !important;
+        padding: 6px 14px !important; /* Уменьшаем внутренние подушки кнопки */
+        border-radius: 8px !important;
+    }
+}
