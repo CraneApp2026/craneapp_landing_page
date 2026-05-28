@@ -61,17 +61,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Делаем так, чтобы при клике на ЛЮБУЮ кнопку в секции #download отправлялся сигнал
     platformButtons.forEach(button => {
-        if (!actionScrollButtons.includes(button)) {
-            button.addEventListener('click', () => {
-                // И здесь тоже меняем localhost на BACKEND_URL
-                fetch(`${BACKEND_URL}/api/increment-downloads`, {
-                    method: 'POST'
-                })
-                .then(res => res.json())
-                .catch(err => console.error('Ошибка отправки клика:', err));
-            });
-        }
+        button.addEventListener('click', () => {
+            fetch(`${BACKEND_URL}/api/increment-downloads`, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Клик успешно засчитан сервером!', data);
+            })
+            .catch(err => console.error('Ошибка отправки клика:', err));
+        });
     });
 
     // ========================================================
