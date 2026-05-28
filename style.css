@@ -23,7 +23,7 @@ body {
     background-attachment: fixed;
 }
 
-/* Анимации */
+
 .anim-fade-in {
     opacity: 0;
     animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -57,7 +57,7 @@ body {
     to { opacity: 1; transform: translateY(0); } 
 }
 
-/* Шапка сайта */
+
 .site-header {
     display: flex;
     justify-content: space-between;
@@ -139,14 +139,13 @@ body {
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Секция Hero (Увеличен отступ для ПК) */
-/* Секция Hero с аккуратным отступом сверху и большим снизу */
+
 .hero {
     display: flex;
     flex-direction: column;
     align-items: flex-start; 
     text-align: left;
-    /* 60px сверху (чтобы быть ближе к шапке), 10% по бокам, 140px снизу (воздух до следующей секции) */
+    
     padding: 60px 10% 140px 10%; 
     max-width: 1300px;
     margin: 0 auto;
@@ -207,10 +206,10 @@ body {
     transition: opacity 0.2s ease;
 }
 
-/* Преимущества (Увеличен зазор между секциями на ПК) */
+
 .benefits-section, .how-it-works-section {
     max-width: 1200px;
-    margin: 140px auto 160px auto; /* Раздвинули крупные блоки */
+    margin: 140px auto 160px auto;
     padding: 0 6%;
 }
 
@@ -267,10 +266,10 @@ body {
     color: rgba(255, 255, 255, 0.55);
 }
 
-/* Секция скачивания (Увеличены отступы для ПК) */
+
 .download-section {
     max-width: 1200px;
-    margin: 160px auto 200px auto; /* Секция больше не жмется к другим */
+    margin: 160px auto 200px auto;
     padding: 0 6%;
     text-align: center; 
 }
@@ -322,13 +321,13 @@ body {
     filter: brightness(0.1); 
 }
 
-/* Бегущая строка (Исправлена анимация и добавлены отступы на ПК) */
+
 .marquee-container {
     width: 100%;
     overflow: hidden;
     background: #9c00cc; 
     padding: 24px 0;
-    margin: 120px 0; /* Больше отступа сверху и снизу строки */
+    margin: 120px 0; 
     display: flex;
 }
 
@@ -367,17 +366,17 @@ body {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-50%); /* Позволяет строке двигаться бесшовно */
+        transform: translateX(-50%); 
     }
 }
 
-/* Подвал / Футер */
+
 .site-footer {
     width: 100%;
     background: rgba(255, 255, 255, 0.01);
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
     padding: 60px 8% 30px 8%;
-    margin-top: 160px; /* Большой чистый отступ перед футером на ПК */
+    margin-top: 160px;
 }
 
 .footer-content {
@@ -440,7 +439,7 @@ body {
     color: #c084fc; 
 }
 
-/* Нижняя панель */
+
 .footer-bottom {
     max-width: 1200px;
     margin: 40px auto 0 auto;
@@ -457,7 +456,7 @@ body {
     font-weight: 500;
 }
 
-/* Адаптивность для смартфонов (Медиа-запросы возвращают компактные отступы) */
+
 @media (max-width: 768px) {
     .site-header { flex-direction: column; gap: 16px; padding: 16px; max-width: 95%; top: 10px; }
     .navigation { gap: 4px; flex-wrap: wrap; justify-content: center; }
@@ -486,35 +485,35 @@ body {
     .footer-links { gap: 40px; flex-wrap: wrap; }
     .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
 }
-/* Контейнер для центрирования */
+
 .stats-container {
     display: flex;
-    flex-direction: column; /* Выстраивает заголовок и карточку друг под другом */
-    align-items: center;    /* Центрирует их по горизонтали */
+    flex-direction: column; 
+    align-items: center;  
     text-align: center;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-/* Красивая карточка в стиле Railway */
+
 .stat-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 24px;
-    padding: 30px 60px; /* Сделали отступы сверху и снизу по 30px, как у таймера */
+    padding: 30px 60px; 
     text-align: center;
     min-width: 300px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Убираем нижний отступ у цифры, так как подписи под ней больше нет */
+
 .stat-number {
     margin-bottom: 0; 
 }
 
-/* Большие светящиеся цифры */
+
 .stat-number {
     display: block;
     font-size: 64px;
@@ -528,20 +527,20 @@ body {
     filter: drop-shadow(0 4px 12px rgba(192, 132, 252, 0.3));
 }
 
-/* Подпись под цифрой */
+
 .stat-label {
     font-size: 16px;
     color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
 }
-/* Контейнер таймера */
+
 .timer-container {
     text-align: center;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-/* Заголовок над таймером */
+
 .timer-title {
     font-size: 20px;
     color: rgba(255, 255, 255, 0.7);
@@ -550,7 +549,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Общая доска таймера */
+
 .timer-board {
     display: inline-flex;
     align-items: center;
@@ -564,7 +563,7 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Секция с одной группой (цифра + подпись) */
+
 .timer-section {
     display: flex;
     flex-direction: column;
@@ -572,7 +571,7 @@ body {
     min-width: 80px;
 }
 
-/* Большие светящиеся цифры */
+
 .timer-number {
     font-size: 56px;
     font-weight: 800;
@@ -585,7 +584,7 @@ body {
     filter: drop-shadow(0 4px 12px rgba(192, 132, 252, 0.3));
 }
 
-/* Подписи (дней, часов и т.д.) */
+
 .timer-label {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.5);
@@ -593,16 +592,16 @@ body {
     font-weight: 500;
 }
 
-/* Разделительные двоеточия */
+
 .timer-divider {
     font-size: 42px;
     font-weight: 700;
     color: rgba(192, 132, 252, 0.4);
     margin: 0 15px;
-    padding-bottom: 25px; /* Немного приподнимаем двоеточие по центру цифр */
+    padding-bottom: 25px; 
 }
 
-/* Адаптивность для мобилок */
+
 @media (max-width: 600px) {
     .timer-board {
         padding: 20px;
@@ -623,55 +622,52 @@ body {
         font-size: 11px;
     }
 }
-/* ========================================================
-   СТИЛИ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ (Экран меньше 768px)
-   ======================================================== */
+
 @media (max-width: 768px) {
-    /* 1. Уменьшаем общие отступы и высоту шапки */
+    
     .site-header, header {
-        padding: 10px 15px !important; /* Делаем шапку узкой */
-        border-radius: 12px !important; /* Чуть уменьшаем скругление углов */
-        margin: 10px !important;        /* Уменьшаем внешние отступы от краев экрана */
+        padding: 10px 15px !important; 
+        border-radius: 12px !important; 
+        margin: 10px !important;    
     }
 
-    /* 2. Делаем логотип компактнее */
+   
     .site-logo, header img {
-        height: 28px !important; /* Уменьшаем высоту логотипа */
-        width: auto;
+        height: 28px !important;
     }
 
-    /* 3. Уменьшаем шрифт у названия CraneApp */
+    
     .brand-name, header h1, header span {
         font-size: 18px !important; 
     }
 
-    /* 4. Сжимаем ссылки и кнопку скачивания */
+    
     .nav-links a {
-        font-size: 13px !important;   /* Чуть меньше шрифт для ссылок */
-        padding: 6px 10px !important; /* Меньше расстояния между ссылками */
+        font-size: 13px !important;  
+        padding: 6px 10px !important; 
     }
 
-    /* 5. Делаем саму кнопку «Скачать» аккуратной */
+    
     .site-header .btn-download, header .btn-primary, header button {
         font-size: 13px !important;
-        padding: 6px 14px !important; /* Уменьшаем внутренние подушки кнопки */
+        padding: 6px 14px !important; 
         border-radius: 8px !important;
     }
 }
-/* Применяем шрифт Geologica ко всему сайту */
+
 * {
     font-family: 'Geologica', sans-serif !important;
 }
 
-/* Фон с эффектом глубокого жидкого размытия */
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(8, 7, 24, 0.4); /* Очень прозрачный темный тон */
-    backdrop-filter: blur(20px) saturate(180%); /* Мощное размытие и сочность цветов сзади */
+    background: rgba(8, 7, 24, 0.4); 
+    backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex;
     justify-content: center;
@@ -687,21 +683,21 @@ body {
     pointer-events: auto;
 }
 
-/* Эффект Liquid Glass (Жидкое стекло) */
+
 .modal-content {
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
     padding: 35px;
-    border-radius: 28px; /* Округлые жидкие формы */
+    border-radius: 28px; 
     
-    /* Блики и внутреннее свечение по краям */
+    
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
-        inset 0 20px 30px rgba(255, 255, 255, 0.08),  /* Верхний жидкий отсвет */
-        inset 0 1px 2px rgba(255, 255, 255, 0.2),     /* Острый верхний край */
-        inset 0 -15px 30px rgba(0, 0, 0, 0.3),         /* Внутренняя глубина */
-        0 20px 50px rgba(0, 0, 0, 0.4);               /* Мягкая внешняя тень */
+        inset 0 20px 30px rgba(255, 255, 255, 0.08),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2), 
+        inset 0 -15px 30px rgba(0, 0, 0, 0.3), 
+        0 20px 50px rgba(0, 0, 0, 0.4);
         
     text-align: center;
     max-width: 420px;
@@ -714,7 +710,7 @@ body {
     transform: translateY(0) scale(1);
 }
 
-/* Внутреннее цветное жидкое свечение */
+
 .modal-glow {
     position: absolute;
     top: -50%;
@@ -728,7 +724,7 @@ body {
     animation: liquidRotate 10s linear infinite;
 }
 
-/* Контент внутри окна */
+
 .modal-icon {
     font-size: 3.5rem;
     margin-bottom: 20px;
@@ -760,7 +756,7 @@ body {
 }
 
 .modal-content strong {
-    color: #a855f7; /* Выделение даты фиолетовым неоном */
+    color: #a855f7; 
     font-weight: 500;
 }
 
@@ -772,7 +768,7 @@ body {
     z-index: 1;
 }
 
-/* Стеклянная жидкая кнопка */
+
 .modal-btn {
     position: relative;
     z-index: 1;
@@ -802,7 +798,7 @@ body {
     transform: translateY(1px);
 }
 
-/* Анимации движения жидкости */
+
 @keyframes liquidFloat {
     0% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-8px) rotate(3deg); }
@@ -812,4 +808,11 @@ body {
 @keyframes liquidRotate {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.stat-number {
+    font-family: 'Geologica', sans-serif !important;
+    font-weight: 700 !important; 
+    font-size: 3.5rem;          
+    letter-spacing: -0.02em; 
 }

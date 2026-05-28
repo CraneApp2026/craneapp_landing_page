@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ========================================================
-    // 1. ТАЙМЕР ОТСЧЕТА ДО РЕЛИЗА
-    // ========================================================
+    
     const targetDate = new Date('September 1, 2026 00:00:00').getTime();
 
     function updateCountdown() {
@@ -32,9 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownInterval = setInterval(updateCountdown, 1000);
 
 
-    // ========================================================
-    // 2. СЧЕТЧИК СКАЧИВАНИЙ И МОДАЛЬНОЕ ОКНО
-    // ========================================================
+    
     const counterElement = document.querySelector('.stat-number');
     const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
@@ -44,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isSubmitting = false;
 
-    // Функция для красивого обновления цифры на экране (стиль Geologica)
+    
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
             counterElement.style.transform = 'scale(1.05)';
-            counterElement.style.fontWeight = '700'; /* Делаем жирнее при анимации */
+            counterElement.style.fontWeight = '700'; 
             counterElement.style.transition = 'transform 0.15s ease, font-weight 0.15s ease';
             setTimeout(() => {
                 counterElement.style.transform = 'scale(1)';
@@ -58,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Логика закрытия модального окна
+    
     if (modalCloseBtn && modal) {
         modalCloseBtn.addEventListener('click', () => {
             modal.classList.remove('active');
@@ -68,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Запрашиваем актуальное число скачиваний с Vercel
+    
     fetch(`${BACKEND_URL}/api/get-downloads`)
         .then(res => res.json())
         .then(data => {
@@ -78,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error('Ошибка получения данных скачиваний:', err));
 
-    // Обработка клика по кнопкам платформ
+    
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             event.preventDefault(); 
@@ -86,13 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const releaseDate = new Date('2026-09-01T00:00:00');
             const currentDate = new Date(); 
 
-            // Если релиз еще не наступил — активируем Liquid Glass поп-ап
+            
             if (currentDate < releaseDate) {
                 if (modal) modal.classList.add('active');
                 return; 
             }
 
-            // --- Код после 1 сентября ---
+           
             if (isSubmitting) return; 
             isSubmitting = true;
 
@@ -102,7 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    updateScreenNumber(data.totalDownloads); 
+                    
+    function updateScreenNumber(num) {
+        if (counterElement) {
+            counterElement.innerText = num.toLocaleString('ru-RU');
+            counterElement.style.transform = 'scale(1.05)';
+            counterElement.style.transition = 'transform 0.15s ease';
+            setTimeout(() => {
+                counterElement.style.transform = 'scale(1)';
+            }, 150);
+        }
+    } 
                 }
             })
             .catch(err => console.error('Ошибка отправки клика на сервер:', err))
