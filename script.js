@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. СЧЕТЧИК СКАЧИВАНИЙ (Кнопки платформ + сервер Vercel)
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
-    const platformButtons = document.querySelectorAll('#download .btn-download, #download a, #download button'); 
+    // Было: const platformButtons = document.querySelectorAll('#download ...');
+    // Стало: ищем абсолютно все кнопки скачивания на странице по тексту и классам
+    const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn');
 
     // ВСТАВЛЯЕМ ТВОЮ ССЫЛКУ ОТ VERCEL СЮДА:
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
