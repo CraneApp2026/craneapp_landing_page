@@ -40,27 +40,47 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // ========================================================
-    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Кнопки платформ + сервер Vercel)
+    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Fetch-версия без сокетов)
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
-    // Было: const platformButtons = document.querySelectorAll('#download ...');
-    // Стало: ищем абсолютно все кнопки скачивания на странице по тексту и классам
-    const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn');
-
-    // ВСТАВЛЯЕМ ТВОЮ ССЫЛКУ ОТ VERCEL СЮДА:
+    const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
-    // Подключаемся к серверу через сокеты по новому адресу
-    const socket = io(BACKEND_URL); 
-
-    socket.on('updateDownloads', (newCount) => {
+    // Функция для красивого обновления цифры на экране
+    function updateScreenNumber(num) {
         if (counterElement) {
-            counterElement.innerText = newCount.toLocaleString('ru-RU');
-            
+            counterElement.innerText = num.toLocaleString('ru-RU');
             counterElement.style.transform = 'scale(1.08)';
             counterElement.style.transition = 'transform 0.1s ease';
             setTimeout(() => counterElement.style.transform = 'scale(1)', 150);
         }
+    }
+
+    // Запрашиваем актуальное число скачиваний при ЗАГРУЗКЕ страницы
+    fetch(`${BACKEND_URL}/api/get-downloads`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.totalDownloads !== undefined) {
+                updateScreenNumber(data.totalDownloads);
+            }
+        })
+        .catch(err => console.error('Ошибка получения данных:', err));
+
+    // Обработка клика по кнопкам
+    platformButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            fetch(`${BACKEND_URL}/api/increment-downloads`, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Клик засчитан!');
+                    updateScreenNumber(data.totalDownloads); // Сразу обновляем цифру
+                }
+            })
+            .catch(err => console.error('Ошибка отправки клика:', err));
+        });
     });
 
     // Делаем так, чтобы при клике на ЛЮБУЮ кнопку в секции #download отправлялся сигнал

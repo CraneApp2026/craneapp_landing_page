@@ -1,41 +1,28 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-    cors: {
-        origin: "*", // Разрешаем доступ твоему сайту на GitHub Pages
-        methods: ["GET", "POST"]
-    }
-});
 
-// Переменная для хранения кликов
-let totalDownloads = 0;
-
-// Чтобы сервер умел читать JSON-запросы
+// Включаем CORS-разрешение для Гитхаба
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// 1. Делаем так, чтобы главная страница сервера отвечала текстом (для проверки)
-app.get('/', (req, res) => {
-    res.send(`Сервер CraneApp запущен! Текущие скачивания: ${totalDownloads}`);
+// Временная переменная для хранения кликов (в памяти сервера)
+let totalDownloads = 1542; // Можешь поставить стартовое число, чтобы не был полный 0!
+
+// 1. Получить текущее число скачиваний (вызывается при загрузке сайта)
+app.get('/api/get-downloads', (req, res) => {
+    res.json({ totalDownloads });
 });
 
-// 2. Маршрут (API) для увеличения счетчика
+// 2. Увеличить число скачиваний (вызывается при клике на кнопку)
 app.post('/api/increment-downloads', (req, res) => {
     totalDownloads++;
-    io.emit('updateDownloads', totalDownloads); // Отправляем новую цифру всем по сокетам
     res.json({ success: true, totalDownloads });
 });
 
-// Сокет-соединение: выдаем цифру сразу при подключении устройства
-io.on('connection', (socket) => {
-    socket.emit('updateDownloads', totalDownloads);
-});
-
-// Настройка порта для Vercel / локального ПК
 const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => {
-    console.log(`Сервер работает на порту ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
 
-// Экспортируем модуль для корректной работы Vercel
-module.exports = http;
+module.exports = app;
