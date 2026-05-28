@@ -658,101 +658,158 @@ body {
         border-radius: 8px !important;
     }
 }
-/* Фон, затемняющий и размывающий страницу */
+/* Применяем шрифт Geologica ко всему сайту */
+* {
+    font-family: 'Geologica', sans-serif !important;
+}
+
+/* Фон с эффектом глубокого жидкого размытия */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px); /* Красивое размытие */
+    background: rgba(8, 7, 24, 0.4); /* Очень прозрачный темный тон */
+    backdrop-filter: blur(20px) saturate(180%); /* Мощное размытие и сочность цветов сзади */
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Окно стало активным */
 .modal-overlay.active {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* Само окошко */
+/* Эффект Liquid Glass (Жидкое стекло) */
 .modal-content {
-    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); /* Темный градиент */
-    padding: 30px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.2); /* Неоновое свечение */
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+    padding: 35px;
+    border-radius: 28px; /* Округлые жидкие формы */
+    
+    /* Блики и внутреннее свечение по краям */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        inset 0 20px 30px rgba(255, 255, 255, 0.08),  /* Верхний жидкий отсвет */
+        inset 0 1px 2px rgba(255, 255, 255, 0.2),     /* Острый верхний край */
+        inset 0 -15px 30px rgba(0, 0, 0, 0.3),         /* Внутренняя глубина */
+        0 20px 50px rgba(0, 0, 0, 0.4);               /* Мягкая внешняя тень */
+        
     text-align: center;
-    max-width: 400px;
+    max-width: 420px;
     width: 90%;
-    transform: scale(0.8);
-    transition: transform 0.3s ease;
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal-overlay.active .modal-content {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
 }
 
-/* Элементы внутри окна */
+/* Внутреннее цветное жидкое свечение */
+.modal-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(0deg);
+    animation: liquidRotate 10s linear infinite;
+}
+
+/* Контент внутри окна */
 .modal-icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
-    animation: float 2s ease-in-out infinite;
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 10px 20px rgba(99, 102, 241, 0.3));
+    animation: liquidFloat 3s ease-in-out infinite;
 }
 
 .modal-content h2 {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-    font-family: sans-serif;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .modal-content p {
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.75);
     font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-content strong {
+    color: #a855f7; /* Выделение даты фиолетовым неоном */
+    font-weight: 500;
 }
 
 .modal-content .modal-subtext {
     font-size: 0.85rem;
-    color: #64748b;
-    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
 }
 
-/* Стильная кнопка закрытия */
+/* Стеклянная жидкая кнопка */
 .modal-btn {
-    background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
-    color: white;
-    border: none;
-    padding: 12px 30px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.8) 0%, rgba(168, 85, 247, 0.8) 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 35px;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 500;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 
+        inset 0 4px 10px rgba(255, 255, 255, 0.2),
+        0 10px 25px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
 }
 
 .modal-btn:hover {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    box-shadow: 
+        inset 0 4px 10px rgba(255, 255, 255, 0.3),
+        0 15px 30px rgba(99, 102, 241, 0.5);
 }
 
 .modal-btn:active {
-    transform: translateY(0);
+    transform: translateY(1px);
 }
 
-/* Анимация левитации иконки ракextы */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+/* Анимации движения жидкости */
+@keyframes liquidFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes liquidRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

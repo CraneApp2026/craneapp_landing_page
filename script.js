@@ -36,23 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. СЧЕТЧИК СКАЧИВАНИЙ И МОДАЛЬНОЕ ОКНО
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
-    // Находим абсолютно все кнопки скачивания (Android, iOS, Windows, Linux)
     const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
-    // Элементы кастомного модального окна
     const modal = document.getElementById('release-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
 
     let isSubmitting = false;
 
-    // Функция для красивого обновления цифры на экране
+    // Функция для красивого обновления цифры на экране (стиль Geologica)
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
-            counterElement.style.transform = 'scale(1.08)';
-            counterElement.style.transition = 'transform 0.1s ease';
-            setTimeout(() => counterElement.style.transform = 'scale(1)', 150);
+            counterElement.style.transform = 'scale(1.05)';
+            counterElement.style.fontWeight = '700'; /* Делаем жирнее при анимации */
+            counterElement.style.transition = 'transform 0.15s ease, font-weight 0.15s ease';
+            setTimeout(() => {
+                counterElement.style.transform = 'scale(1)';
+                counterElement.style.fontWeight = '400';
+            }, 150);
         }
     }
 
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Запрашиваем актуальное число скачиваний с Vercel при загрузке страницы
+    // Запрашиваем актуальное число скачиваний с Vercel
     fetch(`${BACKEND_URL}/api/get-downloads`)
         .then(res => res.json())
         .then(data => {
@@ -79,19 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработка клика по кнопкам платформ
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            event.preventDefault(); // Запрещаем переход по ссылке-заглушке
+            event.preventDefault(); 
 
             const releaseDate = new Date('2026-09-01T00:00:00');
             const currentDate = new Date(); 
 
-            // Если релиз еще не наступил — показываем наше красивое окно и блокируем отправку
+            // Если релиз еще не наступил — активируем Liquid Glass поп-ап
             if (currentDate < releaseDate) {
                 if (modal) modal.classList.add('active');
                 return; 
             }
 
-            // --- Этот код сработает строго ПОСЛЕ 1 сентября 2026 года ---
-            if (isSubmitting) return; // Защита от двойного клика (дребезга)
+            // --- Код после 1 сентября ---
+            if (isSubmitting) return; 
             isSubmitting = true;
 
             fetch(`${BACKEND_URL}/api/increment-downloads`, {
@@ -100,12 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    updateScreenNumber(data.totalDownloads); // Обновляем счетчик на экране цифрой от сервера
+                    updateScreenNumber(data.totalDownloads); 
                 }
             })
             .catch(err => console.error('Ошибка отправки клика на сервер:', err))
             .finally(() => {
-                // Разблокируем отправку кликов через 300мс
                 setTimeout(() => { isSubmitting = false; }, 300);
             });
         });
