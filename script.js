@@ -39,24 +39,23 @@ document.addEventListener("DOMContentLoaded", () => {
     
     });
 
-  // ========================================================
-    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Fetch-версия без сокетов)
+ // ========================================================
+    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Защита от кликов до 1 сентября)
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
     const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
-    // Функция для красивого обновления цифры на экране
+    let isSubmitting = false;
+
+    // Функция для обновления цифры на экране
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
-            counterElement.style.transform = 'scale(1.08)';
-            counterElement.style.transition = 'transform 0.1s ease';
-            setTimeout(() => counterElement.style.transform = 'scale(1)', 150);
         }
     }
 
-    // Запрашиваем актуальное число скачиваний при ЗАГРУЗКЕ страницы
+    // Запрашиваем число скачиваний при загрузке страницы
     fetch(`${BACKEND_URL}/api/get-downloads`)
         .then(res => res.json())
         .then(data => {
@@ -66,37 +65,41 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(err => console.error('Ошибка получения данных:', err));
 
-    // Обработка клика по кнопкам
+    // Обработка клика по кнопкам с проверкой даты
     platformButtons.forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
+            // Отменяем стандартный переход по ссылке, если он есть
+            event.preventDefault(); 
+
+            // Настраиваем дату релиза: 1 сентября 2026 года
+            const releaseDate = new Date('2026-09-01T00:00:00');
+            const currentDate = new Date(); // Текущее время пользователя
+
+            // Если релиз еще не наступил — блокируем клик
+            if (currentDate < releaseDate) {
+                alert('Релиз CraneApp состоится 1 сентября 2026 года! Скачивание будет доступно автоматически.');
+                return; // Прерываем выполнение кода, на сервер ничего не отправляется
+            }
+
+            // --- КОД НИЖЕ СРАБОТАЕТ ТОЛЬКО ПОСЛЕ 1 СЕНТЯБРЯ ---
+            if (isSubmitting) return;
+            isSubmitting = true;
+
             fetch(`${BACKEND_URL}/api/increment-downloads`, {
                 method: 'POST'
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    console.log('Клик засчитан!');
-                    updateScreenNumber(data.totalDownloads); // Сразу обновляем цифру
+                    updateScreenNumber(data.totalDownloads);
                 }
             })
-            .catch(err => console.error('Ошибка отправки клика:', err));
+            .catch(err => console.error('Ошибка отправки клика:', err))
+            .finally(() => {
+                setTimeout(() => { isSubmitting = false; }, 300);
+            });
         });
     });
-
-    // Делаем так, чтобы при клике на ЛЮБУЮ кнопку в секции #download отправлялся сигнал
-    platformButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            fetch(`${BACKEND_URL}/api/increment-downloads`, {
-                method: 'POST'
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log('Клик успешно засчитан сервером!', data);
-            })
-            .catch(err => console.error('Ошибка отправки клика:', err));
-        });
-    });
-
     // ========================================================
     // 3. ТАЙМЕР ОБРАТНОГО ОТСЧЕТА ДО 1 СЕНТЯБРЯ
     // ========================================================
