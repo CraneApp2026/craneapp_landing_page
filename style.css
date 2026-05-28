@@ -658,3 +658,101 @@ body {
         border-radius: 8px !important;
     }
 }
+/* Фон, затемняющий и размывающий страницу */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px); /* Красивое размытие */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Окно стало активным */
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Само окошко */
+.modal-content {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); /* Темный градиент */
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.2); /* Неоновое свечение */
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+/* Элементы внутри окна */
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: float 2s ease-in-out infinite;
+}
+
+.modal-content h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    font-family: sans-serif;
+}
+
+.modal-content p {
+    color: #94a3b8;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.modal-content .modal-subtext {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* Стильная кнопка закрытия */
+.modal-btn {
+    background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+}
+
+.modal-btn:active {
+    transform: translateY(0);
+}
+
+/* Анимация левитации иконки ракextы */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}

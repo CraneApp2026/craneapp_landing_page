@@ -1,61 +1,72 @@
-document.addEventListener("DOMContentLoaded", () => {
-    
+document.addEventListener('DOMContentLoaded', () => {
     // ========================================================
-    // 1. КНОПКИ СКРОЛЛА (Шапка «Скачать» и кнопка «Установить» на главном экране)
+    // 1. ТАЙМЕР ОТСЧЕТА ДО РЕЛИЗА
     // ========================================================
-    // Находим кнопку в меню и кнопку на первом экране
-    const scrollButtons = document.querySelectorAll('.site-header .btn-download, header a[href="#download"], .nav-links a[href="#download"], .hero .btn-download, .btn-install');
-    
-    // Дополнительный умный поиск: ищем кнопку «Установить приложение» по её тексту, если нет классов
-    const allButtons = document.querySelectorAll('button, a');
-    const installBtnByText = Array.from(allButtons).find(el => {
-        const text = el.textContent.trim().toLowerCase();
-        return text.includes('установить') || text.includes('установить приложение');
-    });
+    const targetDate = new Date('September 1, 2026 00:00:00').getTime();
 
-    // Собираем все кнопки скролла в один список
-    const actionScrollButtons = Array.from(scrollButtons);
-    if (installBtnByText && !actionScrollButtons.includes(installBtnByText)) {
-        actionScrollButtons.push(installBtnByText);
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference <= 0) {
+            document.getElementById('days').innerText = '00';
+            document.getElementById('hours').innerText = '00';
+            document.getElementById('minutes').innerText = '00';
+            document.getElementById('seconds').innerText = '00';
+            clearInterval(countdownInterval);
+            return;
+        }
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+        document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+        document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
     }
 
-    // Навешиваем на них плавное центрирование секции
-    actionScrollButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const downloadSection = document.querySelector('#download');
-            
-            if (downloadSection) {
-                event.preventDefault(); // Отменяем резкий скачок страницы вверх
-                
-                // Плавно ставим секцию скачивания ровно по центру экрана
-                downloadSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        });
-    });
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
 
-    
-    });
 
- // ========================================================
-    // 2. СЧЕТЧИК СКАЧИВАНИЙ (Защита от кликов до 1 сентября)
+    // ========================================================
+    // 2. СЧЕТЧИК СКАЧИВАНИЙ И МОДАЛЬНОЕ ОКНО
     // ========================================================
     const counterElement = document.querySelector('.stat-number');
+    // Находим абсолютно все кнопки скачивания (Android, iOS, Windows, Linux)
     const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
+    // Элементы кастомного модального окна
+    const modal = document.getElementById('release-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
     let isSubmitting = false;
 
-    // Функция для обновления цифры на экране
+    // Функция для красивого обновления цифры на экране
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
+            counterElement.style.transform = 'scale(1.08)';
+            counterElement.style.transition = 'transform 0.1s ease';
+            setTimeout(() => counterElement.style.transform = 'scale(1)', 150);
         }
     }
 
-    // Запрашиваем число скачиваний при загрузке страницы
+    // Логика закрытия модального окна
+    if (modalCloseBtn && modal) {
+        modalCloseBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+    }
+
+    // Запрашиваем актуальное число скачиваний с Vercel при загрузке страницы
     fetch(`${BACKEND_URL}/api/get-downloads`)
         .then(res => res.json())
         .then(data => {
@@ -63,26 +74,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateScreenNumber(data.totalDownloads);
             }
         })
-        .catch(err => console.error('Ошибка получения данных:', err));
+        .catch(err => console.error('Ошибка получения данных скачиваний:', err));
 
-    // Обработка клика по кнопкам с проверкой даты
+    // Обработка клика по кнопкам платформ
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            // Отменяем стандартный переход по ссылке, если он есть
-            event.preventDefault(); 
+            event.preventDefault(); // Запрещаем переход по ссылке-заглушке
 
-            // Настраиваем дату релиза: 1 сентября 2026 года
             const releaseDate = new Date('2026-09-01T00:00:00');
-            const currentDate = new Date(); // Текущее время пользователя
+            const currentDate = new Date(); 
 
-            // Если релиз еще не наступил — блокируем клик
+            // Если релиз еще не наступил — показываем наше красивое окно и блокируем отправку
             if (currentDate < releaseDate) {
-                alert('Релиз CraneApp состоится 1 сентября 2026 года! Скачивание будет доступно автоматически.');
-                return; // Прерываем выполнение кода, на сервер ничего не отправляется
+                if (modal) modal.classList.add('active');
+                return; 
             }
 
-            // --- КОД НИЖЕ СРАБОТАЕТ ТОЛЬКО ПОСЛЕ 1 СЕНТЯБРЯ ---
-            if (isSubmitting) return;
+            // --- Этот код сработает строго ПОСЛЕ 1 сентября 2026 года ---
+            if (isSubmitting) return; // Защита от двойного клика (дребезга)
             isSubmitting = true;
 
             fetch(`${BACKEND_URL}/api/increment-downloads`, {
@@ -91,54 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    updateScreenNumber(data.totalDownloads);
+                    updateScreenNumber(data.totalDownloads); // Обновляем счетчик на экране цифрой от сервера
                 }
             })
-            .catch(err => console.error('Ошибка отправки клика:', err))
+            .catch(err => console.error('Ошибка отправки клика на сервер:', err))
             .finally(() => {
+                // Разблокируем отправку кликов через 300мс
                 setTimeout(() => { isSubmitting = false; }, 300);
             });
         });
     });
-    // ========================================================
-    // 3. ТАЙМЕР ОБРАТНОГО ОТСЧЕТА ДО 1 СЕНТЯБРЯ
-    // ========================================================
-    function initCountdown() {
-        const currentYear = new Date().getFullYear();
-        // Точное время запуска (00:00:00 по МСК)
-        const targetDate = new Date(`${currentYear}-09-01T00:00:00+03:00`).getTime();
-
-        const daysElement = document.getElementById('days');
-        const hoursElement = document.getElementById('hours');
-        const minutesElement = document.getElementById('minutes');
-        const secondsElement = document.getElementById('seconds');
-
-        function updateTimer() {
-            const now = new Date().getTime();
-            const difference = targetDate - now;
-
-            if (difference < 0) {
-                const timerBoard = document.querySelector('.timer-board');
-                if (timerBoard) {
-                    timerBoard.innerHTML = "<span class='timer-number' style='font-size: 28px;'>Релиз состоялся!</span>";
-                }
-                clearInterval(timerInterval);
-                return;
-            }
-
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-            if (daysElement) daysElement.innerText = days < 10 ? '0' + days : days;
-            if (hoursElement) hoursElement.innerText = hours < 10 ? '0' + hours : hours;
-            if (minutesElement) minutesElement.innerText = minutes < 10 ? '0' + minutes : minutes;
-            if (secondsElement) secondsElement.innerText = seconds < 10 ? '0' + seconds : seconds;
-        }
-
-        updateTimer();
-        const timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    initCountdown();
+});
