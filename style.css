@@ -810,9 +810,21 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+
 .stat-number {
     font-family: 'Geologica', sans-serif !important;
-    font-weight: 700 !important; 
-    font-size: 3.5rem;          
-    letter-spacing: -0.02em; 
+    font-weight: 700 !important;      
+    font-size: 3.5rem;               
+    letter-spacing: -0.02em;         
+    
+    
+    background: linear-gradient(180deg, #ffffff 0%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    
+   
+    filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.55));
+    
+    display: inline-block; 
 }
