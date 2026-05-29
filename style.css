@@ -828,3 +828,24 @@ body {
     
     display: inline-block; 
 }
+
+.header .logo img, 
+[class*="logo"] img {
+    object-fit: contain !important; 
+    flex-shrink: 0 !important;    
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.logo-container {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+.logo-container img {
+    width: 40px !important;   
+    height: 40px !important;
+    object-fit: contain !important; 
+    flex-shrink: 0 !important; 
+}
