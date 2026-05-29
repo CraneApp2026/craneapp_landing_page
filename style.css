@@ -849,3 +849,21 @@ body {
     object-fit: contain !important; 
     flex-shrink: 0 !important; 
 }
+
+.hero, main, .main-screen {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    
+    min-height: calc(100vh - 80px) !important;
+    box-sizing: border-box !important;
+    padding: 40px 20px !important;
+    
+    text-align: center !important;
+}
+
+
+.hero h1, .main-screen h1 {
+    margin-top: 0 !important;
+}
