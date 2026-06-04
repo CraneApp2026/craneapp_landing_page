@@ -31,7 +31,8 @@ const ADMIN_USERS = {
     "khazatsky":     "kH2@qN7zX4sV_khaz",
     "saimoncinema":  "sC5&mL1vR9pW_saim",
     "mezz1k":        "mZ4*pX8vK2qN_mezz",
-    "err412":        "eR7%vW1xQ9pL_err4"
+    "err412":        "eR7%vW1xQ9pL_err4",
+    "knrcharge":     "dUB4@knHs08K_knrc"
 };
 
 // База активных сессионных токенов (сбрасывается при перезапуске инстанса)
