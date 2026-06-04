@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CraneApp — Панель управления</title>
+    <title>CraneApp — Крипто-Панель</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -24,24 +24,24 @@
             transition: all 0.4s ease;
         }
         
-        #auth-block { max-width: 400px; text-align: center; }
-        #admin-block { max-width: 700px; display: none; } /* Скрыта по умолчанию */
+        #auth-block { max-width: 420px; }
+        #admin-block { max-width: 750px; display: none; } /* Скрыта по умолчанию */
 
-        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h1 { font-size: 1.8rem; font-weight: 700; text-align: center; margin-top: 0; background: linear-gradient(90deg, #fff, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .stat-box { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
             padding: 20px; border-radius: 16px; text-align: center;
         }
-        .stat-title { font-size: 0.9rem; color: #94a3b8; margin-bottom: 5px; }
-        .stat-num { font-size: 2.2rem; font-weight: 700; background: linear-gradient(180deg, #ffffff 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4)); }
+        .stat-title { font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; }
+        .stat-num { font-size: 2.2rem; font-weight: 700; color: #c084fc; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4)); }
         .section-title { font-size: 1.2rem; font-weight: 700; margin: 30px 0 15px; color: #c084fc; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; padding-left: 5px; }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; padding-left: 4px; }
         
         input, textarea { 
-            width: 100%; padding: 14px 20px; background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; 
+            width: 100%; padding: 14px 20px; background: rgba(0, 0, 0, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; 
             color: white; font-size: 0.95rem; outline: none; transition: all 0.3s;
         }
         textarea { resize: vertical; min-height: 80px; }
@@ -53,24 +53,49 @@
             font-size: 1rem; font-weight: bold; border-radius: 50px; cursor: pointer; 
             box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3); transition: all 0.3s; margin-top: 10px;
         }
-        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5); }
-        .status { text-align: center; margin-top: 15px; font-weight: 500; }
+        .btn-gradient:hover { transform: translateY(-1px); box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5); }
+        .status { text-align: center; margin-top: 15px; font-weight: 500; font-size: 0.9rem; }
+
+        #qr-container { text-align: center; margin: 20px 0; display: none; }
+        #qr-container img { background: white; padding: 10px; border-radius: 14px; width: 180px; height: 180px; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        #totp-field-group { display: none; }
     </style>
 </head>
 <body>
 
     <div id="auth-block" class="glass-card">
-        <h1>🔒 Вход в систему</h1>
-        <p style="color: #94a3b8; margin-bottom: 25px;">Доступ разрешен только администраторам CraneApp</p>
-        <div class="form-group">
-            <input type="password" id="auth-pass" placeholder="Введите ключ доступа" onkeydown="if(event.key==='Enter') login()">
+        <h1>🔒 Авторизация ядра</h1>
+        
+        <div id="credentials-fields">
+            <div class="form-group">
+                <label>Идентификатор оператора (Логин)</label>
+                <input type="text" id="auth-user" placeholder="Админ-имя">
+            </div>
+            <div class="form-group">
+                <label>Криптографический ключ (Пароль)</label>
+                <input type="password" id="auth-pass" placeholder="10-12 символов">
+            </div>
+            <button class="btn-gradient" onclick="verifyCredentials()">Запросить доступ</button>
         </div>
-        <button class="btn-gradient" onclick="login()">Войти в панель</button>
+
+        <div id="qr-container">
+            <p style="font-size:0.85rem; color:#a78bfa; margin-bottom: 15px;">⚠️ Обязательная привязка 2FA.<br>Сканируйте QR в Google Authenticator:</p>
+            <img id="qr-img" src="" alt="2FA QR">
+        </div>
+
+        <div id="totp-field-group">
+            <div class="form-group">
+                <label>Временный токен TOTP (из приложения)</label>
+                <input type="text" id="auth-totp" placeholder="000000" maxlength="6" onkeydown="if(event.key==='Enter') verifyTwoFactor()">
+            </div>
+            <button class="btn-gradient" onclick="verifyTwoFactor()">Подтвердить токен</button>
+        </div>
+
         <div class="status" id="auth-status"></div>
     </div>
 
     <div id="admin-block" class="glass-card">
-        <h1>⚙️ Управление CraneApp</h1>
+        <h1>⚙️ Панель управления CraneApp</h1>
         
         <div class="stats-grid">
             <div class="stat-box">
@@ -123,48 +148,89 @@
             <input type="text" id="txt-counterTitle">
         </div>
 
-        <button class="btn-gradient" onclick="saveChanges()">🚀 Применить изменения</button>
+        <button class="btn-gradient" onclick="saveChanges()">🚀 Сохранить в облако</button>
         <div class="status" id="status-msg"></div>
     </div>
 
     <script>
         const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
-        let savedPassword = '';
+        let currentUsername = '';
+        let globalSessionToken = '';
 
-        // Функция входа
-        function login() {
-            const passInput = document.getElementById('auth-pass').value;
-            const authStatus = document.getElementById('auth-status');
+        // Шаг 1: Проверка Логина и Автоматического Пароля
+        function verifyCredentials() {
+            currentUsername = document.getElementById('auth-user').value;
+            const pass = document.getElementById('auth-pass').value;
+            const status = document.getElementById('auth-status');
 
-            if (!passInput) {
-                authStatus.innerText = "❌ Введите пароль!";
-                authStatus.style.color = "#ef4444";
+            if(!currentUsername || !pass) {
+                status.innerText = "❌ Заполните все поля!"; 
+                status.style.color = "#ef4444"; 
                 return;
             }
 
-            // Проверяем пароль, отправляя пустой тестовый запрос обновлений на бэкенд
-            fetch(BACKEND_URL + '/api/admin/update-site', {
+            fetch(BACKEND_URL + '/api/admin/login-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: passInput })
+                body: JSON.stringify({ username: currentUsername, password: pass })
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Неверные учетные данные");
+                }
+                return res.json();
+            })
             .then(data => {
-                // Если бэкенд ругнулся на некорректные данные, но пароль ВЕРНЫЙ (статус не 403)
-                // Или если он вернул success: true
-                if (data.message !== "Неверный пароль!") {
-                    savedPassword = passInput; // Запоминаем сессионный пароль
+                if (data.success) {
+                    status.innerText = "";
+                    // Плавный переход интерфейса к полю 2FA
+                    document.getElementById('credentials-fields').style.display = 'none';
+                    document.getElementById('totp-field-group').style.display = 'block';
+
+                    // Если это первый запуск — рендерим QR код
+                    if (data.step === "setup_2fa") {
+                        document.getElementById('qr-img').src = data.qrCode;
+                        document.getElementById('qr-container').style.display = 'block';
+                    }
+                }
+            })
+            .catch(() => { 
+                status.innerText = "❌ Доступ отклонен (Проверьте логин/пароль)"; 
+                status.style.color = "#ef4444"; 
+            });
+        }
+
+        // Шаг 2: Верификация ТОТП-кода со смартфона
+        function verifyTwoFactor() {
+            const code = document.getElementById('auth-totp').value;
+            const status = document.getElementById('auth-status');
+
+            if(!code || code.length !== 6) {
+                status.innerText = "❌ Токен должен состоять из 6 цифр!";
+                status.style.color = "#ef4444";
+                return;
+            }
+
+            fetch(BACKEND_URL + '/api/admin/verify-2fa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUsername, code: code })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    globalSessionToken = data.sessionToken; // Принимаем сессионную подпись
                     document.getElementById('auth-block').style.display = 'none';
                     document.getElementById('admin-block').style.display = 'block';
-                    loadData(); // Грузим данные только после успешного входа
-                } else {
-                    authStatus.innerText = "❌ Неверный ключ доступа!";
-                    authStatus.style.color = "#ef4444";
+                    loadData(); // Только теперь загружаем конфиги сайта
                 }
             })
             .catch(() => {
-                authStatus.innerText = "❌ Ошибка авторизации на сервере.";
-                authStatus.style.color = "#ef4444";
+                status.innerText = "❌ Ошибка: Неверный 2FA-токен!"; 
+                status.style.color = "#ef4444";
             });
         }
 
@@ -174,7 +240,6 @@
                 .then(data => {
                     document.getElementById('download-val').innerText = data.totalDownloads;
                     document.getElementById('input-downloads').value = data.totalDownloads;
-                    
                     for (let key in data.texts) {
                         const el = document.getElementById('txt-' + key);
                         if (el) el.value = data.texts[key];
@@ -186,15 +251,13 @@
                 .then(data => {
                     document.getElementById('visit-val').innerText = data.totalVisits;
                     document.getElementById('input-visits').value = data.totalVisits;
-                })
-                .catch(err => console.error(err));
+                });
         }
 
         function saveChanges() {
             const statusMsg = document.getElementById('status-msg');
-
             const updatedData = {
-                password: savedPassword, // Используем сохраненный при логине пароль
+                sessionToken: globalSessionToken, // Валидируем операцию подписью сессии
                 totalDownloads: parseInt(document.getElementById('input-downloads').value),
                 totalVisits: parseInt(document.getElementById('input-visits').value),
                 texts: {
@@ -215,16 +278,16 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    statusMsg.innerText = "✅ " + data.message;
+                    statusMsg.innerText = "✅ Изменения успешно применены!"; 
                     statusMsg.style.color = "#22c55e";
                     loadData();
                 } else {
-                    statusMsg.innerText = "❌ " + data.message;
+                    statusMsg.innerText = "❌ " + data.message; 
                     statusMsg.style.color = "#ef4444";
                 }
             })
             .catch(() => {
-                statusMsg.innerText = "❌ Ошибка сохранения.";
+                statusMsg.innerText = "❌ Не удалось сохранить данные."; 
                 statusMsg.style.color = "#ef4444";
             });
         }
