@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const crypto = require('crypto'); // Добавили встроенный модуль для шифрования
 
 const app = express();
 app.use(cors({ origin: '*' }));
@@ -22,14 +23,26 @@ let siteData = {
     }
 };
 
-// ХРАНИЛИЩЕ УЧЕТНЫХ ЗАПИСЕЙ (Сгенерированные криптоустойчивые пароли ровно по 12 символов)
+// ХРАНИЛИЩЕ УЧЕТНЫХ ЗАПИСЕЙ (Все твои новые админы с уникальными паролями)
 const ADMIN_USERS = {
-    "crane_root": { password: "mZ9$vK2xQ7pW", twofaSecret: null, twofaVerified: false },
-    "crane_dev":  { password: "bN4v%Z8qR2mX", twofaSecret: null, twofaVerified: false }
+    "math_solvers": "mZ9$vK2xQ7pW_math",
+    "loikbruni":     "bR8!nX4vL1pQ_loik",
+    "zhuroffa":      "zH3#fW9tK5mY_zhur",
+    "khazatsky":     "kH2@qN7zX4sV_khaz",
+    "saimoncinema":  "sC5&mL1vR9pW_saim",
+    "mezz1k":        "mZ4*pX8vK2qN_mezz",
+    "err412":        "eR7%vW1xQ9pL_err4"
 };
 
 // База активных сессионных токенов (сбрасывается при перезапуске инстанса)
 let activeSessions = new Set();
+
+// Функция, создающая вечный и уникальный 2FA-секрет из пары Логин + Пароль
+function getDeterministicSecret(username, password) {
+    const hash = crypto.createHmac('sha256', password).update(username).digest('hex');
+    // Форматируем хэш под стандарт base32 для Google Authenticator (32 символа, буквы A-Z и цифры 2-7)
+    return hash.substring(0, 32).toUpperCase().replace(/[^A-Z2-7]/g, 'A');
+}
 
 // Функция расширенного логирования для детекции потенциальных утечек
 function logSecurityEvent(action, username, req) {
@@ -68,39 +81,48 @@ app.post('/api/increment-downloads', (req, res) => {
 app.post('/api/admin/login-password', (req, res) => {
     const { username, password } = req.body;
     
-    if (!ADMIN_USERS[username] || ADMIN_USERS[username].password !== password) {
+    // Проверяем пароль прямо из нашего нового списка ADMIN_USERS
+    if (!ADMIN_USERS[username] || ADMIN_USERS[username] !== password) {
         logSecurityEvent("ОТКАЗ ВХОДА (Некорректные данные)", username, req);
         return res.status(401).json({ success: false, message: "Ошибка авторизации!" });
     }
 
-    const user = ADMIN_USERS[username];
+    // Генерируем постоянный секрет для этого пользователя
+    const userSecret = getDeterministicSecret(username, password);
 
-    // Если это первый вход — генерируем секретный ключ TOTP 2FA
-    if (!user.twofaSecret) {
-        const secret = speakeasy.generateSecret({ name: `CraneApp Core (${username})` });
-        user.twofaSecret = secret.base32;
-        
-        // Превращаем секретный ключ в QR-код для Google Authenticator
-        qrcode.toDataURL(secret.otpauth_url, (err, dataUrl) => {
-            return res.json({ success: true, step: "setup_2fa", qrCode: dataUrl });
-        });
-    } else {
-        // Если 2FA уже привязан — просто запрашиваем 6-значный код
-        return res.json({ success: true, step: "verify_2fa" });
-    }
+    // Создаем ссылку для приложения-аутентификатора
+    const otpauthUrl = speakeasy.otpauthURL({
+        secret: userSecret,
+        label: `CraneApp:${username}`,
+        encoding: 'base32'
+    });
+    
+    // Поскольку мы убрали ручные секреты и сделали схему без лишних шагов,
+    // мы ВСЕГДА возвращаем шаг "setup_2fa" и картинку QR-кода.
+    // Администратор сканирует QR при первом входе, а при следующих заходах
+    // этот же QR-код просто висит на экране, пока админ вводит 6 цифр из приложения.
+    qrcode.toDataURL(otpauthUrl, (err, dataUrl) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: "Ошибка генерации QR-кода" });
+        }
+        return res.json({ success: true, step: "setup_2fa", qrCode: dataUrl });
+    });
 });
 
 // Проверка 2-го фактора: Верификация TOTP-токена
 app.post('/api/admin/verify-2fa', (req, res) => {
     const { username, code } = req.body;
-    const user = ADMIN_USERS[username];
+    const password = ADMIN_USERS[username];
 
-    if (!user || !user.twofaSecret) {
+    if (!password) {
         return res.status(400).json({ success: false, message: "Пройдите первый этап авторизации!" });
     }
 
+    // Генерируем тот же самый секрет для сверки кода
+    const userSecret = getDeterministicSecret(username, password);
+
     const isCodeValid = speakeasy.totp.verify({
-        secret: user.twofaSecret,
+        secret: userSecret,
         encoding: 'base32',
         token: code,
         window: 1 // Окно рассинхронизации времени устройства ±30 секунд
