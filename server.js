@@ -8,33 +8,27 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// ПОЛНАЯ БАЗА ДАННЫХ ЛЕНДИНГА (Без ломающих тегов, со всеми кнопками и счетчиками!)
+// БАЗА ДАННЫХ ЛЕНДИНГА (Полная структура со всеми текстами и кнопками)
 let siteData = {
     totalDownloads: 0,
     totalVisits: 0,
     visitedIPs: [],
     texts: {
-        // Вернули чистый текст, чтобы не вылезали уродливые теги на экране
-        heroTitle: "Мессенджер, созданный для вашей безопасности.",
+        // Тег span внутри строки — теперь фронтенд отобразит его правильно
+        heroTitle: "Мессенджер, созданный для <span class=\"text-purple\">вашей</span> безопасности.",
         heroSubtitle: "Пока крупные корпорации монетизируют персональные данные, три разработчика из Новокузнецка создали альтернативу.",
-        
-        // РАЗДЕЛИЛИ КНОПКИ, чтобы кнопка в шапке не превращалась в "Установить приложение"
         btnHeaderDownload: "Скачать", 
         btnInstall: "Установить приложение",
         btnHowItWorks: "Как это работает?",
-        
         timerTitle: "До релиза осталось:",
         counterTitle: "Скачиваний приложения по всему миру:",
-        
-        // ДОПОЛНИТЕЛЬНЫЕ ВОЗМОЖНОСТИ ПРАВОК (Ссылки, меню, футер)
         menuLink1: "Главная",
         menuLink2: "Плюсы",
-        menuLink3: "Инструкция",
-        footerCopyright: "© 2026 CraneApp. Все права защищены."
+        menuLink3: "Инструкция"
     }
 };
 
-// ХРАНИЛИЩЕ УЧЕТНЫХ ЗАПИСЕЙ АДМИНИСТРАТОРОВ (Вечный 2FA на основе логин+пароль)
+// ХРАНИЛИЩЕ УЧЕТНЫХ ЗАПИСЕЙ АДМИНИСТРАТОРОВ (Вечный 2FA на основе логина и пароля)
 const ADMIN_USERS = {
     "math_solvers": "mZ9$vK2xQ7pW_math",
     "loikbruni":     "bR8!nX4vL1pQ_loik",
@@ -47,6 +41,7 @@ const ADMIN_USERS = {
 
 let activeSessions = new Set();
 
+// Генератор уникального неизменяемого 2FA секрета
 function getDeterministicSecret(username, password) {
     const hash = crypto.createHmac('sha256', password).update(username).digest('hex');
     return hash.substring(0, 32).toUpperCase().replace(/[^A-Z2-7]/g, 'A');
@@ -54,12 +49,11 @@ function getDeterministicSecret(username, password) {
 
 function logSecurityEvent(action, username, req) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'] || 'Unknown';
     const realIp = req.headers['x-real-ip'] || ip; 
     console.log(`[SECURITY EVENT] [${new Date().toISOString()}] Действие: ${action} | Логин: ${username} | IP: ${realIp}`);
 }
 
-// --- ИНТЕРФЕЙСЫ ДАННЫХ ---
+// --- ОТКРЫТЫЕ ИНТЕРФЕЙСЫ ДЛЯ ЛЕНДИНГА ---
 app.get('/api/get-site-data', (req, res) => res.json(siteData));
 app.get('/api/get-visits', (req, res) => res.json({ totalVisits: siteData.totalVisits }));
 
@@ -77,7 +71,7 @@ app.post('/api/increment-downloads', (req, res) => {
     res.json({ success: true, totalDownloads: siteData.totalDownloads });
 });
 
-// --- АВТОРИЗАЦИЯ И СЕССИИ ---
+// --- АДМИНКА: СЕССИИ И АВТОРИЗАЦИЯ ---
 
 app.post('/api/admin/login-password', (req, res) => {
     const { username, password } = req.body;
@@ -96,7 +90,7 @@ app.post('/api/admin/login-password', (req, res) => {
     
     qrcode.toDataURL(otpauthUrl, (err, dataUrl) => {
         if (err) return res.status(500).json({ success: false });
-        // Исправлено: возвращаем статус успешного первого шага
+        // Возвращаем шаг verify_2fa, чтобы фронтенд переключался на форму ввода цифр
         return res.json({ success: true, step: "verify_2fa", qrCode: dataUrl });
     });
 });
@@ -120,7 +114,7 @@ app.post('/api/admin/verify-2fa', (req, res) => {
         return res.status(412).json({ success: false, message: "Неверный код 2FA!" });
     }
 
-    // Генерируем сессию, которая точно примется методом update-site
+    // Создаем сессионный токен изменений
     const sessionToken = crypto.randomBytes(24).toString('hex');
     activeSessions.add(sessionToken);
 
@@ -131,6 +125,7 @@ app.post('/api/admin/verify-2fa', (req, res) => {
 app.post('/api/admin/update-site', (req, res) => {
     const { sessionToken, totalDownloads, totalVisits, texts } = req.body;
 
+    // Валидация сессии
     if (!sessionToken || !activeSessions.has(sessionToken)) {
         return res.status(403).json({ success: false, message: "Ошибка доступа: сессия не валидна!" });
     }

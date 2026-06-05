@@ -73,6 +73,50 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`${BACKEND_URL}/api/get-site-data`)
         .then(res => res.json())
         .then(data => {
+
+// 1. Помещаем саму функцию в файл (например, в самый конец или начало)
+function updateFrontendContent(data) {
+    if (!data || !data.texts) return;
+
+    // Исправление для главного заголовка (теперь фиолетовое слово не ломается)
+    const titleElement = document.getElementById('hero-title');
+    if (titleElement && data.texts.heroTitle) {
+        titleElement.innerHTML = data.texts.heroTitle; 
+    }
+
+    // Обновление подзаголовка
+    const subtitleElement = document.getElementById('hero-subtitle');
+    if (subtitleElement && data.texts.heroSubtitle) {
+        subtitleElement.innerText = data.texts.heroSubtitle;
+    }
+
+    // Точечное разделение кнопок по их ID
+    const headerBtn = document.getElementById('header-download-btn'); // Кнопка в шапке ("Скачать")
+    const heroBtn = document.getElementById('hero-install-btn');     // Кнопка по центру ("Установить...")
+
+    if (headerBtn && data.texts.btnHeaderDownload) {
+        headerBtn.innerText = data.texts.btnHeaderDownload; 
+    }
+    if (heroBtn && data.texts.btnInstall) {
+        heroBtn.innerText = data.texts.btnInstall; 
+    }
+
+    // Обновление счетчика скачиваний
+    const downloadsCounter = document.getElementById('downloads-count');
+    if (downloadsCounter && data.totalDownloads !== undefined) {
+        downloadsCounter.innerText = data.totalDownloads;
+    }
+}
+
+// 2. Вызываем эту функцию там, где ты получаешь данные от Vercel:
+fetch('https://craneapp-landing-page.vercel.app/api/get-site-data') // тут твоя ссылка на бэкенд
+    .then(res => res.json())
+    .then(data => {
+        // Просто передаем данные в нашу функцию обновления
+        updateFrontendContent(data); 
+    })
+    .catch(err => console.error("Ошибка загрузки данных лендинга:", err));
+
             // Обновляем цифру скачиваний актуальным значением
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
