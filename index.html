@@ -37,7 +37,7 @@
             три разработчика из Новокузнецка создали альтернативу.
         </p>
         <div class="hero-buttons">
-            <a href="#download" id="hero-install-btn" class="btn-primary">Установить приложение</a>
+            <a href="#download" id="hero-install-btn"> Установить приложение</a>
             <a href="#instruction" class="btn-secondary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 Как это работает?
@@ -277,6 +277,47 @@
         <button id="modal-close-btn" class="modal-btn">Отлично, жду!</button>
     </div>
 </div>
+
+<script>
+  // Твоя ссылка на бэкенд Vercel (поменяй на свою!)
+  const BACKEND_URL = 'https://craneapp-landing-page.vercel.app'; 
+
+  fetch(`${BACKEND_URL}/api/get-site-data`)
+    .then(response => response.json())
+    .then(data => {
+      if (!data || !data.texts) return;
+
+      // 1. Фикс фиолетового слова: принудительно активируем теги через innerHTML
+      const titleElement = document.getElementById('hero-title');
+      if (titleElement && data.texts.heroTitle) {
+        titleElement.innerHTML = data.texts.heroTitle; 
+      }
+
+      // 2. Обновление подзаголовка
+      const subtitleElement = document.getElementById('hero-subtitle');
+      if (subtitleElement && data.texts.heroSubtitle) {
+        subtitleElement.innerText = data.texts.heroSubtitle;
+      }
+
+      // 3. Точечное разделение кнопок (больше кнопка в шапке не превратится в длинный текст)
+      const headerBtn = document.getElementById('header-download-btn');
+      const heroBtn = document.getElementById('hero-install-btn');
+
+      if (headerBtn && data.texts.btnHeaderDownload) {
+        headerBtn.innerText = data.texts.btnHeaderDownload; // Сюда встанет "Скачать"
+      }
+      if (heroBtn && data.texts.btnInstall) {
+        heroBtn.innerText = data.texts.btnInstall; // Сюда встанет "Установить приложение"
+      }
+
+      // 4. Обновление счетчиков (если на странице есть блоки с такими ID)
+      const downloadsCounter = document.getElementById('downloads-count');
+      if (downloadsCounter && data.totalDownloads !== undefined) {
+        downloadsCounter.innerText = data.totalDownloads;
+      }
+    })
+    .catch(err => console.error("Ошибка обновления контента:", err));
+</script>
 
 </body>
 </html>
