@@ -73,50 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`${BACKEND_URL}/api/get-site-data`)
         .then(res => res.json())
         .then(data => {
-
-// 1. Помещаем саму функцию в файл (например, в самый конец или начало)
-function updateFrontendContent(data) {
-    if (!data || !data.texts) return;
-
-    // Исправление для главного заголовка (теперь фиолетовое слово не ломается)
-    const titleElement = document.getElementById('hero-title');
-    if (titleElement && data.texts.heroTitle) {
-        titleElement.innerHTML = data.texts.heroTitle; 
-    }
-
-    // Обновление подзаголовка
-    const subtitleElement = document.getElementById('hero-subtitle');
-    if (subtitleElement && data.texts.heroSubtitle) {
-        subtitleElement.innerText = data.texts.heroSubtitle;
-    }
-
-    // Точечное разделение кнопок по их ID
-    const headerBtn = document.getElementById('header-download-btn'); // Кнопка в шапке ("Скачать")
-    const heroBtn = document.getElementById('hero-install-btn');     // Кнопка по центру ("Установить...")
-
-    if (headerBtn && data.texts.btnHeaderDownload) {
-        headerBtn.innerText = data.texts.btnHeaderDownload; 
-    }
-    if (heroBtn && data.texts.btnInstall) {
-        heroBtn.innerText = data.texts.btnInstall; 
-    }
-
-    // Обновление счетчика скачиваний
-    const downloadsCounter = document.getElementById('downloads-count');
-    if (downloadsCounter && data.totalDownloads !== undefined) {
-        downloadsCounter.innerText = data.totalDownloads;
-    }
-}
-
-// 2. Вызываем эту функцию там, где ты получаешь данные от Vercel:
-fetch('https://craneapp-landing-page.vercel.app/api/get-site-data') // тут твоя ссылка на бэкенд
-    .then(res => res.json())
-    .then(data => {
-        // Просто передаем данные в нашу функцию обновления
-        updateFrontendContent(data); 
-    })
-    .catch(err => console.error("Ошибка загрузки данных лендинга:", err));
-
             // Обновляем цифру скачиваний актуальным значением
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
@@ -125,13 +81,21 @@ fetch('https://craneapp-landing-page.vercel.app/api/get-site-data') // тут т
             // Синхронизируем тексты на странице с тем, что сохранено в админке
             if (data.texts) {
                 const h1 = document.querySelector('.hero h1, main h1, .main-screen h1');
-                if (h1 && data.texts.heroTitle) h1.innerText = data.texts.heroTitle;
+                if (h1 && data.texts.heroTitle) h1.innerHTML = data.texts.heroTitle;
 
                 const subtitle = document.querySelector('.hero p, main p, .main-screen p');
                 if (subtitle && data.texts.heroSubtitle) subtitle.innerText = data.texts.heroSubtitle;
 
-                const btnInstall = document.querySelector('.cta-header-btn, .btn-primary'); 
-                if (btnInstall && data.texts.btnInstall) btnInstall.innerText = data.texts.btnInstall;
+                // Разделяем кнопки: в шапке всегда "Скачать", по центру — "Установить приложение" из базы
+                const headerBtn = document.querySelector('.cta-header-btn');
+                const heroBtn = document.querySelector('.btn-primary');
+
+                if (headerBtn) {
+                    headerBtn.innerText = 'Скачать';
+                }
+                if (heroBtn && data.texts.btnInstall) {
+                    heroBtn.innerText = data.texts.btnInstall;
+                }
 
                 const timerTitle = document.querySelector('.timer-title');
                 if (timerTitle && data.texts.timerTitle) timerTitle.innerText = data.texts.timerTitle;
@@ -169,7 +133,7 @@ fetch('https://craneapp-landing-page.vercel.app/api/get-site-data') // тут т
                     updateScreenNumber(data.totalDownloads); 
                 }
             })
-            .catch(err => console.error('Ошибка отправки клика на сервер:', err))
+            .catch(err => console.error('Ошибка отправки клика на server:', err))
             .finally(() => {
                 setTimeout(() => { isSubmitting = false; }, 300);
             });

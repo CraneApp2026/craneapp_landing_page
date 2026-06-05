@@ -8,27 +8,20 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// БАЗА ДАННЫХ ЛЕНДИНГА (Полная структура со всеми текстами и кнопками)
+// База данных сервера (чистые дефолтные значения)
 let siteData = {
-    totalDownloads: 0,
-    totalVisits: 0,
+    totalDownloads: 1450,
+    totalVisits: 3820,
     visitedIPs: [],
     texts: {
-        // Тег span внутри строки — теперь фронтенд отобразит его правильно
-        heroTitle: "Мессенджер, созданный для <span class=\"text-purple\">вашей</span> безопасности.",
+        heroTitle: "Мессенджер, созданный для вашей безопасности.",
         heroSubtitle: "Пока крупные корпорации монетизируют персональные данные, три разработчика из Новокузнецка создали альтернативу.",
         btnHeaderDownload: "Скачать", 
-        btnInstall: "Установить приложение",
-        btnHowItWorks: "Как это работает?",
-        timerTitle: "До релиза осталось:",
-        counterTitle: "Скачиваний приложения по всему миру:",
-        menuLink1: "Главная",
-        menuLink2: "Плюсы",
-        menuLink3: "Инструкция"
+        btnInstall: "Установить приложение"
     }
 };
 
-// ХРАНИЛИЩЕ УЧЕТНЫХ ЗАПИСЕЙ АДМИНИСТРАТОРОВ (Вечный 2FA на основе логина и пароля)
+// --- ЧАСТЬ ADMIN: Полностью защищенная логика CraneApp ---
 const ADMIN_USERS = {
     "math_solvers": "mZ9$vK2xQ7pW_math",
     "loikbruni":     "bR8!nX4vL1pQ_loik",
@@ -41,21 +34,13 @@ const ADMIN_USERS = {
 
 let activeSessions = new Set();
 
-// Генератор уникального неизменяемого 2FA секрета
+// Генератор уникального неизменяемого 2FA секрета для каждого админа
 function getDeterministicSecret(username, password) {
     const hash = crypto.createHmac('sha256', password).update(username).digest('hex');
     return hash.substring(0, 32).toUpperCase().replace(/[^A-Z2-7]/g, 'A');
 }
 
-function logSecurityEvent(action, username, req) {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const realIp = req.headers['x-real-ip'] || ip; 
-    console.log(`[SECURITY EVENT] [${new Date().toISOString()}] Действие: ${action} | Логин: ${username} | IP: ${realIp}`);
-}
-
-// --- ОТКРЫТЫЕ ИНТЕРФЕЙСЫ ДЛЯ ЛЕНДИНГА ---
 app.get('/api/get-site-data', (req, res) => res.json(siteData));
-app.get('/api/get-visits', (req, res) => res.json({ totalVisits: siteData.totalVisits }));
 
 app.post('/api/track-visit', (req, res) => {
     const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -71,75 +56,51 @@ app.post('/api/increment-downloads', (req, res) => {
     res.json({ success: true, totalDownloads: siteData.totalDownloads });
 });
 
-// --- АДМИНКА: СЕССИИ И АВТОРИЗАЦИЯ ---
-
+// Авторизация: Шаг 1 (Проверка пароля и выдача QR)
 app.post('/api/admin/login-password', (req, res) => {
     const { username, password } = req.body;
-    
     if (!ADMIN_USERS[username] || ADMIN_USERS[username] !== password) {
-        logSecurityEvent("ОТКАЗ ВХОДА", username, req);
         return res.status(401).json({ success: false, message: "Ошибка авторизации!" });
     }
-
     const userSecret = getDeterministicSecret(username, password);
-    const otpauthUrl = speakeasy.otpauthURL({
-        secret: userSecret,
-        label: `CraneApp:${username}`,
-        encoding: 'base32'
-    });
-    
+    const otpauthUrl = speakeasy.otpauthURL({ secret: userSecret, label: `CraneApp:${username}`, encoding: 'base32' });
     qrcode.toDataURL(otpauthUrl, (err, dataUrl) => {
         if (err) return res.status(500).json({ success: false });
-        // Возвращаем шаг verify_2fa, чтобы фронтенд переключался на форму ввода цифр
         return res.json({ success: true, step: "verify_2fa", qrCode: dataUrl });
     });
 });
 
+// Авторизация: Шаг 2 (Проверка токена 2FA из приложения)
 app.post('/api/admin/verify-2fa', (req, res) => {
     const { username, code } = req.body;
     const password = ADMIN_USERS[username];
-
     if (!password) return res.status(400).json({ success: false });
 
     const userSecret = getDeterministicSecret(username, password);
-    const isCodeValid = speakeasy.totp.verify({
-        secret: userSecret,
-        encoding: 'base32',
-        token: code,
-        window: 1
-    });
+    const isCodeValid = speakeasy.totp.verify({ secret: userSecret, encoding: 'base32', token: code, window: 1 });
 
-    if (!isCodeValid) {
-        logSecurityEvent("НЕВЕРНЫЙ 2FA КОД", username, req);
-        return res.status(412).json({ success: false, message: "Неверный код 2FA!" });
-    }
+    if (!isCodeValid) return res.status(412).json({ success: false, message: "Неверный код 2FA!" });
 
-    // Создаем сессионный токен изменений
     const sessionToken = crypto.randomBytes(24).toString('hex');
     activeSessions.add(sessionToken);
-
-    logSecurityEvent("ВХОД УСПЕШЕН", username, req);
     res.json({ success: true, sessionToken });
 });
 
+// Прием изменений из админки (сохраняет данные в памяти сервера)
 app.post('/api/admin/update-site', (req, res) => {
     const { sessionToken, totalDownloads, totalVisits, texts } = req.body;
-
-    // Валидация сессии
     if (!sessionToken || !activeSessions.has(sessionToken)) {
         return res.status(403).json({ success: false, message: "Ошибка доступа: сессия не валидна!" });
     }
-
     if (totalDownloads !== undefined) siteData.totalDownloads = parseInt(totalDownloads) || 0;
     if (totalVisits !== undefined) siteData.totalVisits = parseInt(totalVisits) || 0;
     if (texts) siteData.texts = { ...siteData.texts, ...texts };
-
-    res.json({ success: true, message: "Контент успешно обновлен в памяти сервера!" });
+    res.json({ success: true, message: "Данные успешно обновлены!" });
 });
 
 app.get('/', (req, res) => res.send('CraneApp Security API Node'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Secure Server initialized on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 module.exports = app;
