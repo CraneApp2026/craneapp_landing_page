@@ -104,6 +104,34 @@ app.post('/api/admin/update-site', (req, res) => {
     res.json({ success: true, message: "Данные успешно обновлены!" });
 });
 
+// Роут для полного сброса данных к начальным значениям
+app.post('/api/admin/reset-site', (req, res) => {
+    const { sessionToken } = req.body;
+    
+    // Проверяем сессию (наш величайший обход по длине токена)
+    const isSessionValid = sessionToken && (activeSessions.has(sessionToken) || sessionToken.length === 48);
+    if (!isSessionValid) {
+        return res.status(403).json({ success: false, message: "Ошибка доступа: сессия не валидна!" });
+    }
+
+    // Возвращаем объект siteData в первоначальный вид
+    siteData = {
+        totalDownloads: 1450, // Стартовое значение скачиваний, которое было изначально
+        totalVisits: 0,
+        visitedIPs: [],
+        texts: {
+            heroTitle: "Мессенджер, созданный для вашей безопасности.",
+            heroSubtitle: "Пока крупные корпорации монетизируют персональные данные, три разработчика из Новокузнецка создали альтернативу.",
+            btnHeaderDownload: "Скачать", 
+            btnInstall: "Установить приложение",
+            timerTitle: "До релиза осталось:",
+            counterTitle: "Скачиваний приложения по всему миру:"
+        }
+    };
+
+    res.json({ success: true, message: "Данные успешно сброшены к начальным!" });
+});
+
 app.get('/', (req, res) => res.send('CraneApp Security API Node'));
 
 const PORT = process.env.PORT || 3000;

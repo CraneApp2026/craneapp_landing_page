@@ -150,6 +150,10 @@
 
         <button class="btn-gradient" onclick="saveChanges()">🚀 Сохранить в облако</button>
         <div class="status" id="status-msg"></div>
+
+<button id="reset-btn" style="background: #ef4444; margin-top: 10px; width: 100%; padding: 12px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: bold;">
+    🔄 Сбросить к начальным значениям
+</button>
     </div>
 
     <script>
@@ -270,6 +274,33 @@ localStorage.setItem('crane_session', data.sessionToken);
                     counterTitle: document.getElementById('txt-counterTitle').value,
                 }
             };
+
+            document.getElementById('reset-btn').addEventListener('click', async () => {
+    if (!confirm('Вы уверены, что хотите сбросить все тексты и счетчики к начальным значениям?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/admin/reset-site`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionToken: globalSessionToken })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Данные успешно сброшены!');
+            // Перезагружаем данные в форме админки, чтобы они стали дефолтными
+            loadData(); 
+        } else {
+            alert('Ошибка при сбросе: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Ошибка запроса сброса:', error);
+        alert('Не удалось связаться с сервером');
+    }
+});
 
             fetch(BACKEND_URL + '/api/admin/update-site', {
                 method: 'POST',
