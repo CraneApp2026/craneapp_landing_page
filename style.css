@@ -763,3 +763,43 @@ body {
         outline: none !important;
     }
 }
+/* Адаптивная шапка для мобильных телефонов */
+@media (max-width: 768px) {
+    /* Выравниваем логотип и навигацию строго по краям на одной линии */
+    .site-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 16px !important; /* Компактные отступы */
+    }
+
+    /* Скрываем текстовые ссылки (Главная, Плюсы, Инструкция), оставляя только кнопку */
+    .navigation a:not(.cta-header-btn) {
+        display: none !important;
+    }
+
+    /* Оставляем видимой только саму кнопку "Скачать" */
+    .navigation {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Стилизуем кнопку "Скачать", чтобы она была аккуратной на экране телефона */
+    .navigation .cta-header-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 16px !important;   /* Аккуратный размер для мобилки */
+        font-size: 0.9rem !important;   /* Слегка уменьшенный шрифт */
+        border-radius: 20px !important; /* Округлая форма кнопки */
+        margin: 0 !important;           /* Убираем лишние отступы */
+        white-space: nowrap !important; /* Запрещаем тексту переноситься */
+    }
+
+    /* Фиксируем контейнер логотипа, чтобы текст CraneApp не съезжал */
+    .logo-container {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+}
