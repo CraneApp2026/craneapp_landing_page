@@ -14,7 +14,6 @@
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         
-       
         .glass-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -73,7 +72,7 @@
             </div>
             <div class="form-group">
                 <label>Криптографический ключ (Пароль)</label>
-                <input type="password" id="auth-pass" placeholder="10-12 символов">
+                <input type="password" id="auth-pass" placeholder="10-12 symbols">
             </div>
             <button class="btn-gradient" onclick="verifyCredentials()">Запросить доступ</button>
         </div>
@@ -151,9 +150,9 @@
         <button class="btn-gradient" onclick="saveChanges()">🚀 Сохранить в облако</button>
         <div class="status" id="status-msg"></div>
 
-<button id="reset-btn" style="background: #ef4444; margin-top: 10px; width: 100%; padding: 12px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: bold;">
-    🔄 Сбросить к начальным значениям
-</button>
+        <button id="reset-btn" style="background: #ef4444; margin-top: 15px; width: 100%; padding: 16px; border-radius: 50px; color: white; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2); transition: all 0.3s;">
+            🔄 Сбросить к начальным значениям (в 0)
+        </button>
     </div>
 
     <script>
@@ -161,7 +160,6 @@
         let currentUsername = '';
         let globalSessionToken = '';
 
-        
         function verifyCredentials() {
             currentUsername = document.getElementById('auth-user').value;
             const pass = document.getElementById('auth-pass').value;
@@ -187,11 +185,9 @@
             .then(data => {
                 if (data.success) {
                     status.innerText = "";
-                    
                     document.getElementById('credentials-fields').style.display = 'none';
                     document.getElementById('totp-field-group').style.display = 'block';
 
-                    
                     if (data.step === "setup_2fa") {
                         document.getElementById('qr-img').src = data.qrCode;
                         document.getElementById('qr-container').style.display = 'block';
@@ -204,7 +200,6 @@
             });
         }
 
-        
         function verifyTwoFactor() {
             const code = document.getElementById('auth-totp').value;
             const status = document.getElementById('auth-status');
@@ -227,7 +222,7 @@
             .then(data => {
                 if(data.success) {
                     globalSessionToken = data.sessionToken;
-localStorage.setItem('crane_session', data.sessionToken);
+                    localStorage.setItem('crane_session', data.sessionToken);
                     document.getElementById('auth-block').style.display = 'none';
                     document.getElementById('admin-block').style.display = 'block';
                     loadData();
@@ -239,32 +234,36 @@ localStorage.setItem('crane_session', data.sessionToken);
             });
         }
 
+        // Обновленная функция — забирает ВСЁ за один запрос и не выдает 404
         function loadData() {
             fetch(BACKEND_URL + '/api/get-site-data')
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('download-val').innerText = data.totalDownloads;
-                    document.getElementById('input-downloads').value = data.totalDownloads;
-                    for (let key in data.texts) {
-                        const el = document.getElementById('txt-' + key);
-                        if (el) el.value = data.texts[key];
+                    // Пишем данные в фиолетовые карточки
+                    document.getElementById('download-val').innerText = data.totalDownloads !== undefined ? data.totalDownloads : 0;
+                    document.getElementById('visit-val').innerText = data.totalVisits !== undefined ? data.totalVisits : 0;
+                    
+                    // Заполняем поля ввода для изменения
+                    document.getElementById('input-downloads').value = data.totalDownloads !== undefined ? data.totalDownloads : 0;
+                    document.getElementById('input-visits').value = data.totalVisits !== undefined ? data.totalVisits : 0;
+                    
+                    // Заполняем тексты
+                    if (data.texts) {
+                        for (let key in data.texts) {
+                            const el = document.getElementById('txt-' + key);
+                            if (el) el.value = data.texts[key];
+                        }
                     }
-                });
-
-            fetch(BACKEND_URL + '/api/get-visits')
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('visit-val').innerText = data.totalVisits;
-                    document.getElementById('input-visits').value = data.totalVisits;
-                });
+                })
+                .catch(err => console.error('Ошибка загрузки объединенных данных:', err));
         }
 
         function saveChanges() {
             const statusMsg = document.getElementById('status-msg');
             const updatedData = {
-                sessionToken: globalSessionToken, // Валидируем операцию подписью сессии
-                totalDownloads: parseInt(document.getElementById('input-downloads').value),
-                totalVisits: parseInt(document.getElementById('input-visits').value),
+                sessionToken: globalSessionToken,
+                totalDownloads: parseInt(document.getElementById('input-downloads').value) || 0,
+                totalVisits: parseInt(document.getElementById('input-visits').value) || 0,
                 texts: {
                     heroTitle: document.getElementById('txt-heroTitle').value,
                     heroSubtitle: document.getElementById('txt-heroSubtitle').value,
@@ -274,33 +273,6 @@ localStorage.setItem('crane_session', data.sessionToken);
                     counterTitle: document.getElementById('txt-counterTitle').value,
                 }
             };
-
-            document.getElementById('reset-btn').addEventListener('click', async () => {
-    if (!confirm('Вы уверены, что хотите сбросить все тексты и счетчики к начальным значениям?')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`${BACKEND_URL}/api/admin/reset-site`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionToken: globalSessionToken })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('Данные успешно сброшены!');
-            // Перезагружаем данные в форме админки, чтобы они стали дефолтными
-            loadData(); 
-        } else {
-            alert('Ошибка при сбросе: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Ошибка запроса сброса:', error);
-        alert('Не удалось связаться с сервером');
-    }
-});
 
             fetch(BACKEND_URL + '/api/admin/update-site', {
                 method: 'POST',
@@ -323,17 +295,43 @@ localStorage.setItem('crane_session', data.sessionToken);
                 statusMsg.style.color = "#ef4444";
             });
         }
-        // Автоматически подтягиваем токен при старте страницы
-window.onload = function() {
-    const savedToken = localStorage.getItem('crane_session');
-    if (savedToken) {
-        globalSessionToken = savedToken;
-        // Если токен есть, можно сразу пробовать загрузить данные
-        document.getElementById('auth-block').style.display = 'none';
-        document.getElementById('admin-block').style.display = 'block';
-        loadData();
-    }
-};
+
+        // Вынесенный отдельный обработчик кнопки СБРОСА
+        document.getElementById('reset-btn').addEventListener('click', async () => {
+            if (!confirm('Вы уверены, что хотите сбросить все тексты и счетчики к начальным значениям (в 0)?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/reset-site`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionToken: globalSessionToken })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Данные успешно сброшены в ноль!');
+                    loadData(); 
+                } else {
+                    alert('Ошибка при сбросе: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Ошибка запроса сброса:', error);
+                alert('Не удалось связаться с сервером');
+            }
+        });
+
+        window.onload = function() {
+            const savedToken = localStorage.getItem('crane_session');
+            if (savedToken) {
+                globalSessionToken = savedToken;
+                document.getElementById('auth-block').style.display = 'none';
+                document.getElementById('admin-block').style.display = 'block';
+                loadData();
+            }
+        };
     </script>
 </body>
 </html>
