@@ -116,7 +116,7 @@ app.post('/api/admin/reset-site', (req, res) => {
 
     // Возвращаем объект siteData в первоначальный вид
     siteData = {
-        totalDownloads: 1450, // Стартовое значение скачиваний, которое было изначально
+        totalDownloads: 0, // Стартовое значение скачиваний, которое было изначально
         totalVisits: 0,
         visitedIPs: [],
         texts: {
