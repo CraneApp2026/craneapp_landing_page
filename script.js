@@ -30,14 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownInterval = setInterval(updateCountdown, 1000);
 
     const counterElement = document.querySelector('.stat-number');
-    const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
     const modal = document.getElementById('release-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     let isSubmitting = false;
 
-    
+    // Специфичные кнопки для скачивания конкретных платформ (внутри секции #download)
+    // Исключаем кнопки из шапки, чтобы они просто скроллили сайт вниз к секции скачивания
+    const platformButtons = document.querySelectorAll('.btn-platform, .btn-download, #download a, #download button'); 
+
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
@@ -49,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   
     if (modalCloseBtn && modal) {
         modalCloseBtn.addEventListener('click', () => {
             modal.classList.remove('active');
@@ -59,14 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    
+    // Трекер визитов (защищенный)
     fetch(`${BACKEND_URL}/api/track-visit`, { method: 'POST' })
         .catch(err => console.error('Ошибка трекера заходов:', err));
 
-    
+    // Безопасное получение данных с валидацией JSON
     fetch(`${BACKEND_URL}/api/get-site-data`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error('Ошибка сервера при получении данных');
+            return res.json();
+        })
         .then(data => {
+            if (!data) return;
+
             // 1. Обновляем счетчик скачиваний
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
@@ -78,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.texts) {
                 const h1 = document.querySelector('.hero h1, main h1, .main-screen h1');
                 if (h1 && data.texts.heroTitle) {
-                    // Подставляем фиолетовый цвет напрямую для слова "вашей"
                     h1.innerHTML = data.texts.heroTitle.replace('вашей', '<span style="color: #a855f7;">вашей</span>');
                 }
 
@@ -108,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         })
-        .catch(err => console.error('Ошибка загрузки данных сайта:', err));
+        .catch(err => console.error('Локальный режим безопасности (Сервер офлайн):', err));
 
-    
+    // Обработчик нажатия на кнопки конкретных платформ
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
@@ -118,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const releaseDate = new Date('2026-09-01T00:00:00');
             const currentDate = new Date(); 
 
-            
             if (currentDate < releaseDate) {
                 if (modal) modal.classList.add('active');
                 return; 
