@@ -14,7 +14,7 @@
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         
-        /* ОБЩАЯ СТЕКЛЯННАЯ КАРТОЧКА (Liquid Glass) */
+       
         .glass-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -157,7 +157,7 @@
         let currentUsername = '';
         let globalSessionToken = '';
 
-        // Шаг 1: Проверка Логина и Автоматического Пароля
+        
         function verifyCredentials() {
             currentUsername = document.getElementById('auth-user').value;
             const pass = document.getElementById('auth-pass').value;
@@ -183,11 +183,11 @@
             .then(data => {
                 if (data.success) {
                     status.innerText = "";
-                    // Плавный переход интерфейса к полю 2FA
+                    
                     document.getElementById('credentials-fields').style.display = 'none';
                     document.getElementById('totp-field-group').style.display = 'block';
 
-                    // Если это первый запуск — рендерим QR код
+                    
                     if (data.step === "setup_2fa") {
                         document.getElementById('qr-img').src = data.qrCode;
                         document.getElementById('qr-container').style.display = 'block';
@@ -200,7 +200,7 @@
             });
         }
 
-        // Шаг 2: Верификация ТОТП-кода со смартфона
+        
         function verifyTwoFactor() {
             const code = document.getElementById('auth-totp').value;
             const status = document.getElementById('auth-status');
@@ -222,10 +222,11 @@
             })
             .then(data => {
                 if(data.success) {
-                    globalSessionToken = data.sessionToken; // Принимаем сессионную подпись
+                    globalSessionToken = data.sessionToken;
+localStorage.setItem('crane_session', data.sessionToken);
                     document.getElementById('auth-block').style.display = 'none';
                     document.getElementById('admin-block').style.display = 'block';
-                    loadData(); // Только теперь загружаем конфиги сайта
+                    loadData();
                 }
             })
             .catch(() => {
@@ -291,6 +292,17 @@
                 statusMsg.style.color = "#ef4444";
             });
         }
+        // Автоматически подтягиваем токен при старте страницы
+window.onload = function() {
+    const savedToken = localStorage.getItem('crane_session');
+    if (savedToken) {
+        globalSessionToken = savedToken;
+        // Если токен есть, можно сразу пробовать загрузить данные
+        document.getElementById('auth-block').style.display = 'none';
+        document.getElementById('admin-block').style.display = 'block';
+        loadData();
+    }
+};
     </script>
 </body>
 </html>
