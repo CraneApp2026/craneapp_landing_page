@@ -12,6 +12,7 @@
         body { 
             background: #0b0a1d; color: white; margin: 0; padding: 40px 20px;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .glass-card {
@@ -25,7 +26,6 @@
         #auth-block { max-width: 420px; }
         #admin-block { max-width: 750px; display: none; }
 
-        /* Заголовок панели строго как на фото 2 */
         .panel-header {
             display: flex;
             align-items: center;
@@ -33,34 +33,22 @@
             gap: 12px;
             margin-bottom: 35px;
         }
-        .panel-header img { width: 32px; height: 32px; }
-        .panel-header h1 { 
-            font-size: 1.85rem; font-weight: 700; margin: 0; 
-            color: #ffffff;
-        }
+        .panel-header h1 { font-size: 1.85rem; font-weight: 700; margin: 0; color: #ffffff; }
         .panel-header h1 span { color: #b07ff0; }
         
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         
-        /* Карточки статистики из фото 2 */
         .stat-box { 
             background: #18172c; 
             border: 1px solid rgba(255, 255, 255, 0.03); 
             padding: 22px 20px; border-radius: 16px; text-align: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
         .stat-title { font-size: 0.85rem; color: #7e7d9c; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .stat-num { font-size: 2.6rem; font-weight: 700; color: #b07ff0; }
         
-        /* Фиолетовые заголовки разделов из оригинального дизайна */
-        .section-title { 
-            font-size: 1.1rem; font-weight: 700; margin: 35px 0 20px; color: #b07ff0; 
-            display: flex; align-items: center; gap: 8px;
-        }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin: 35px 0 20px; color: #b07ff0; display: flex; align-items: center; gap: 8px; }
         
         .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group.half { width: 100%; }
-        
         label { display: block; font-size: 0.85rem; color: #7e7d9c; margin-bottom: 10px; }
         
         input, textarea { 
@@ -71,23 +59,16 @@
         textarea { resize: vertical; min-height: 80px; }
         input:focus, textarea:focus { border-color: #b07ff0; background: #0f0e26; }
         
-        /* Кнопка сохранить */
         .btn-gradient { 
-            background: #8b5cf6; color: white; 
-            border: none; padding: 18px; width: 100%; 
+            background: #8b5cf6; color: white; border: none; padding: 18px; width: 100%; 
             font-size: 1.05rem; font-weight: 600; border-radius: 50px; cursor: pointer; 
             box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3); transition: all 0.3s; margin-top: 15px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-gradient:hover { transform: translateY(-1px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.45); }
         
-        .status { text-align: center; margin-top: 18px; font-weight: 500; font-size: 0.95rem; }
+        .status { text-align: center; margin-top: 18px; font-weight: 500; font-size: 0.95rem; min-height: 24px; }
 
-        #qr-container { text-align: center; margin: 20px 0; display: none; }
-        #qr-container img { background: white; padding: 10px; border-radius: 14px; width: 180px; height: 180px; }
-        #totp-field-group { display: none; }
-
-        /* Кнопка сброса */
         #reset-btn { 
             background: #ef4444; margin-top: 20px; width: 100%; 
             padding: 16px; border-radius: 50px; color: white; border: none; 
@@ -95,14 +76,43 @@
             transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         #reset-btn:hover { background: #dc2626; }
+
+        /* КРАСИВОЕ МОДАЛЬНОЕ ОКНО СТИЛЕ CRANEAPP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 7, 24, 0.75); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-card {
+            background: #131224; border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 35px; border-radius: 24px; max-width: 440px; width: 90%;
+            text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            transform: translateY(20px); transition: all 0.3s ease;
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        
+        .modal-icon { font-size: 3rem; margin-bottom: 15px; display: inline-block; }
+        .modal-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: white; }
+        .modal-text { font-size: 0.95rem; color: #7e7d9c; margin-bottom: 25px; line-height: 1.5; }
+        
+        .modal-buttons { display: flex; gap: 15px; justify-content: center; }
+        .modal-btn {
+            padding: 14px 28px; border-radius: 50px; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; border: none; transition: all 0.2s; min-width: 120px;
+        }
+        .modal-btn.confirm { background: #8b5cf6; color: white; }
+        .modal-btn.confirm:hover { background: #7c3aed; }
+        .modal-btn.cancel { background: #1c1a36; color: #7e7d9c; border: 1px solid rgba(255,255,255,0.05); }
+        .modal-btn.cancel:hover { background: #252347; color: white; }
     </style>
 </head>
 <body>
 
     <div id="auth-block" class="glass-card">
-        <div class="panel-header">
-            <h1>🔒 Авторизация</h1>
-        </div>
+        <div class="panel-header"><h1>🔒 Авторизация</h1></div>
         <div id="credentials-fields">
             <div class="form-group">
                 <label>Логин оператора</label>
@@ -114,12 +124,6 @@
             </div>
             <button class="btn-gradient" onclick="verifyCredentials()">Войти в систему</button>
         </div>
-
-        <div id="qr-container">
-            <p style="font-size:0.85rem; color:#b07ff0; margin-bottom: 15px;">Сканируйте QR в Google Authenticator:</p>
-            <img id="qr-img" src="" alt="2FA QR">
-        </div>
-
         <div id="totp-field-group">
             <div class="form-group">
                 <label>Токен TOTP (6 цифр)</label>
@@ -149,11 +153,11 @@
 
         <div class="section-title">📊 Накрутка / Корректировка цифр</div>
         <div class="stats-grid">
-            <div class="form-group half">
+            <div class="form-group">
                 <label>Изменить заходы</label>
                 <input type="number" id="input-visits" value="0">
             </div>
-            <div class="form-group half">
+            <div class="form-group">
                 <label>Изменить скачивания</label>
                 <input type="number" id="input-downloads" value="0">
             </div>
@@ -169,11 +173,11 @@
             <textarea id="txt-heroSubtitle"></textarea>
         </div>
         <div class="stats-grid">
-            <div class="form-group half">
+            <div class="form-group">
                 <label>Текст кнопки 1</label>
                 <input type="text" id="txt-btnInstall">
             </div>
-            <div class="form-group half">
+            <div class="form-group">
                 <label>Текст кнопки 2</label>
                 <input type="text" id="txt-btnHowItWorks">
             </div>
@@ -190,9 +194,19 @@
         <button class="btn-gradient" onclick="saveChanges()">🚀 Сохранить в облако</button>
         <div class="status" id="status-msg"></div>
 
-        <button id="reset-btn">
+        <button id="reset-btn" onclick="showResetConfirmation()">
             🔄 Сбросить к начальным значениям (в 0)
         </button>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon" id="modal-icon">⚠️</div>
+            <div class="modal-title" id="modal-title">Подтверждение</div>
+            <div class="modal-text" id="modal-text">Вы уверены, что хотите выполнить это действие?</div>
+            <div class="modal-buttons" id="modal-buttons-container">
+                </div>
+        </div>
     </div>
 
     <script>
@@ -200,7 +214,6 @@
         let currentUsername = '';
         let globalSessionToken = '';
 
-        // Жесткие дефолты. Даже если бэкенд сломается — окна НЕ пропадут!
         const defaultTexts = {
             heroTitle: "Мессенджер, созданный для вашей безопасности.",
             heroSubtitle: "Пока крупные корпорации монетизируют персональные данные, три разработчика из Новокузнецка создали альтернативу.",
@@ -209,6 +222,39 @@
             timerTitle: "До релиза осталось:",
             counterTitle: "Скачиваний приложения по всему миру:"
         };
+
+        // ФУНКЦИЯ ДЛЯ ВЫЗОВА КАСТОМНОГО ОКНА
+        function openModal({ icon, title, text, showCancel, onConfirm }) {
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            
+            const btnContainer = document.getElementById('modal-buttons-container');
+            btnContainer.innerHTML = '';
+
+            if (showCancel) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'modal-btn cancel';
+                cancelBtn.innerText = 'Нет';
+                cancelBtn.onclick = closeModal;
+                btnContainer.appendChild(cancelBtn);
+            }
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'modal-btn confirm';
+            confirmBtn.innerText = showCancel ? 'Да' : 'Отлично';
+            confirmBtn.onclick = () => {
+                closeModal();
+                if (onConfirm) onConfirm();
+            };
+            btnContainer.appendChild(confirmBtn);
+
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
 
         function verifyCredentials() {
             currentUsername = document.getElementById('auth-user').value;
@@ -225,14 +271,14 @@
                 if (data.success) {
                     document.getElementById('credentials-fields').style.display = 'none';
                     document.getElementById('totp-field-group').style.display = 'block';
-                    if (data.step === "setup_2fa") {
-                        document.getElementById('qr-img').src = data.qrCode;
-                        document.getElementById('qr-container').style.display = 'block';
-                    }
                 } else {
                     status.innerText = "❌ Ошибка авторизации";
+                    status.style.color = "#ef4444";
                 }
-            }).catch(() => { status.innerText = "❌ Сервер авторизации недоступен"; });
+            }).catch(() => { 
+                status.innerText = "❌ Не удалось связаться с сервером"; 
+                status.style.color = "#ef4444";
+            });
         }
 
         function verifyTwoFactor() {
@@ -251,11 +297,12 @@
                     document.getElementById('admin-block').style.display = 'block';
                     loadData();
                 }
+            }).catch(() => {
+                document.getElementById('auth-status').innerText = "❌ Ошибка проверки 2FA";
             });
         }
 
         function loadData() {
-            // Инициализируем поля дефолтными значениями ЗАРАНЕЕ, чтобы они не были пустыми
             for (let key in defaultTexts) {
                 const el = document.getElementById('txt-' + key);
                 if (el) el.value = defaultTexts[key];
@@ -273,20 +320,20 @@
                         if (data.texts) {
                             for (let key in defaultTexts) {
                                 const el = document.getElementById('txt-' + key);
-                                if (el && data.texts[key]) {
-                                    el.value = data.texts[key];
-                                }
+                                if (el && data.texts[key]) el.value = data.texts[key];
                             }
                         }
                     }
                 })
                 .catch(() => {
-                    console.log("Бэкенд вернул ошибку, применены локальные тексты безопасности.");
+                    console.log("Локальный режим безопасности активирован (сервер офлайн).");
                 });
         }
 
         function saveChanges() {
             const statusMsg = document.getElementById('status-msg');
+            statusMsg.innerText = "⏳ Сохранение...";
+            statusMsg.style.color = "#b07ff0";
             
             const updatedData = {
                 sessionToken: globalSessionToken,
@@ -312,9 +359,63 @@
                 if(data.success) {
                     statusMsg.innerText = "✅ Изменения успешно применены!"; 
                     statusMsg.style.color = "#22c55e";
-                    loadData();
+                    openModal({
+                        icon: "🚀",
+                        title: "Успешно!",
+                        text: "Данные отправлены в облако и сохранены.",
+                        showCancel: false
+                    });
+                } else {
+                    statusMsg.innerText = "❌ Ошибка сохранения";
+                    statusMsg.style.color = "#ef4444";
                 }
+            })
+            .catch(() => {
+                statusMsg.innerText = "❌ Сервер не отвечает. Изменения не сохранены.";
+                statusMsg.style.color = "#ef4444";
+                openModal({
+                    icon: "📡",
+                    title: "Ошибка сети",
+                    text: "Не удалось связаться с сервером Vercel. Проверьте соединение или бэкенд.",
+                    showCancel: false
+                });
             });
+        }
+
+        function showResetConfirmation() {
+            openModal({
+                icon: "⚠️",
+                title: "Сброс данных",
+                text: "Вы уверены, что хотите сбросить все тексты и счетчики к начальным значениям (в 0)?",
+                showCancel: true,
+                onConfirm: executeReset
+            });
+        }
+
+        async function executeReset() {
+            const statusMsg = document.getElementById('status-msg');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/reset-site`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionToken: globalSessionToken })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    loadData();
+                    openModal({ icon: "🔄", title: "Сброшено!", text: "Все параметры успешно сброшены в исходное состояние.", showCancel: false });
+                } else {
+                    alert('Ошибка: ' + data.message);
+                }
+            } catch (error) {
+                openModal({
+                    icon: "📡",
+                    title: "Ошибка сети",
+                    text: "Не удалось связаться с сервером для сброса параметров.",
+                    showCancel: false
+                });
+            }
         }
 
         window.onload = function() {
