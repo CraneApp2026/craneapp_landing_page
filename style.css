@@ -16,12 +16,35 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     letter-spacing: -0.3px;
-    background-color: #050309;
+    
+    /* Твой базовый темный цвет фона */
+    background-color: #030014; 
+    
+    /* Твои оригинальные градиенты со скриншота */
     background-image: 
         radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.35) 0%, transparent 50%),
         radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.25) 0%, transparent 45%),
         radial-gradient(circle at 85% 85%, rgba(219, 39, 119, 0.2) 0%, transparent 40%);
+        
+    /* Фиксируем фон, чтобы он переливался при прокрутке сайта */
     background-attachment: fixed;
+    
+    /* Увеличиваем размер для плавной анимации */
+    background-size: 130% 130%;
+    animation: backgroundGlow 12s ease-in-out infinite alternate;
+}
+
+/* Анимация плавного смещения цветовых сфер */
+@keyframes backgroundGlow {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 50% 100%;
+    }
 }
 
 /* --- Анимации --- */
@@ -678,45 +701,65 @@ body {
     .timer-divider { font-size: 24px; margin: 0 5px; padding-bottom: 18px; }
     .timer-label { font-size: 11px; }
 }
-.text-purple {
-    color: #c084fc !important;
-}
-/* ========================================================
-   АДАПТИВ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ (ШИРИНА ЭКРАНА ДО 768px)
-   ======================================================== */
+
 @media (max-width: 768px) {
-    /* Настраиваем контейнер шапки, чтобы всё встало в одну линию */
-    .site-header, header, nav { 
+    .site-header { 
         display: flex !important;
+        flex-direction: row !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 10px 16px !important;
+        padding: 8px 16px !important;
         width: 100% !important;
-        box-sizing: border-box;
+        height: auto !important;
+        box-sizing: border-box !important;
     }
 
-    /* Скрываем ссылки обычного текстового меню (Главная, Плюсы, Инструкция) */
-    .site-header a:not(.cta-header-btn):not(:has(img)), 
-    nav a:not(.cta-header-btn),
-    .menu-links, 
-    .nav-menu { 
+    /* Скрываем обычные ссылки, оставляя nav видимым */
+    .navigation a:not(.cta-header-btn) { 
         display: none !important; 
     }
 
-    /* Убеждаемся, что блок с логотипом и названием не скрывается и стоит слева */
-    .logo-container, .brand {
+    .navigation {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0 !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .logo-container {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
     }
 
-    /* Делаем кнопку "Скачать" компактной и аккуратной на телефонах */
-    .cta-header-btn {
+    .logo-text {
+        font-size: 16px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Бьем по всем возможным комбинациям классов кнопки в твоем HTML */
+    header .navigation a.cta-header-btn,
+    .site-header .navigation .cta-header-btn,
+    .navigation.cta-header-btn,
+    a[href="#download"].cta-header-btn {
         display: inline-block !important;
-        padding: 8px 16px !important;
-        font-size: 14px !important;
-        border-radius: 20px !important;
+        padding: 6px 14px !important;
+        font-size: 13px !important;
+        border-radius: 16px !important;
         text-align: center !important;
-        white-space: nowrap !important; /* Чтобы текст не перенослился на две строки */
+        white-space: nowrap !important;
+        
+        /* Жестко прописываем стеклянный стиль */
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        color: #ffffff !important;
+        font-weight: 500 !important;
+        
+        /* Сбрасываем возможную белую рамку или тени от десктопа */
+        box-shadow: none !important;
+        outline: none !important;
     }
 }

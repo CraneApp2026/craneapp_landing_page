@@ -8,10 +8,10 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// База данных сервера (чистые дефолтные значения)
+
 let siteData = {
-    totalDownloads: 1450,
-    totalVisits: 3820,
+    totalDownloads: 0,
+    totalVisits: 0,
     visitedIPs: [],
     texts: {
         heroTitle: "Мессенджер, созданный для вашей безопасности.",
@@ -21,7 +21,7 @@ let siteData = {
     }
 };
 
-// --- ЧАСТЬ ADMIN: Полностью защищенная логика CraneApp ---
+
 const ADMIN_USERS = {
     "math_solvers": "mZ9$vK2xQ7pW_math",
     "loikbruni":     "bR8!nX4vL1pQ_loik",
@@ -34,7 +34,7 @@ const ADMIN_USERS = {
 
 let activeSessions = new Set();
 
-// Генератор уникального неизменяемого 2FA секрета для каждого админа
+
 function getDeterministicSecret(username, password) {
     const hash = crypto.createHmac('sha256', password).update(username).digest('hex');
     return hash.substring(0, 32).toUpperCase().replace(/[^A-Z2-7]/g, 'A');
@@ -56,7 +56,7 @@ app.post('/api/increment-downloads', (req, res) => {
     res.json({ success: true, totalDownloads: siteData.totalDownloads });
 });
 
-// Авторизация: Шаг 1 (Проверка пароля и выдача QR)
+
 app.post('/api/admin/login-password', (req, res) => {
     const { username, password } = req.body;
     if (!ADMIN_USERS[username] || ADMIN_USERS[username] !== password) {
@@ -70,7 +70,7 @@ app.post('/api/admin/login-password', (req, res) => {
     });
 });
 
-// Авторизация: Шаг 2 (Проверка токена 2FA из приложения)
+
 app.post('/api/admin/verify-2fa', (req, res) => {
     const { username, code } = req.body;
     const password = ADMIN_USERS[username];
@@ -86,7 +86,7 @@ app.post('/api/admin/verify-2fa', (req, res) => {
     res.json({ success: true, sessionToken });
 });
 
-// Прием изменений из админки (сохраняет данные в памяти сервера)
+
 app.post('/api/admin/update-site', (req, res) => {
     const { sessionToken, totalDownloads, totalVisits, texts } = req.body;
     if (!sessionToken || !activeSessions.has(sessionToken)) {

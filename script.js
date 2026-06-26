@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ========================================================
-    // 1. ТАЙМЕР ОТСЧЕТА ДО РЕЛИЗА
-    // ========================================================
+    
     const targetDate = new Date('September 1, 2026 00:00:00').getTime();
 
     function updateCountdown() {
@@ -31,10 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCountdown();
     const countdownInterval = setInterval(updateCountdown, 1000);
 
-
-    // ========================================================
-    // 2. ДИНАМИЧЕСКИЙ СЧЕТЧИК, ТЕКСТЫ И МОДАЛЬНОЕ ОКНО
-    // ========================================================
     const counterElement = document.querySelector('.stat-number');
     const platformButtons = document.querySelectorAll('.btn-download, [id*="download"] a, [id*="download"] button, .download-btn'); 
     const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
@@ -43,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseBtn = document.getElementById('modal-close-btn');
     let isSubmitting = false;
 
-    // Функция для красивого обновления цифры на экране (стиль Geologica)
+    
     function updateScreenNumber(num) {
         if (counterElement) {
             counterElement.innerText = num.toLocaleString('ru-RU');
@@ -55,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Логика закрытия модального окна
+   
     if (modalCloseBtn && modal) {
         modalCloseBtn.addEventListener('click', () => {
             modal.classList.remove('active');
@@ -65,62 +59,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // А. Фиксируем посещение (счетчик уникальных заходов в админку)
+    
     fetch(`${BACKEND_URL}/api/track-visit`, { method: 'POST' })
         .catch(err => console.error('Ошибка трекера заходов:', err));
 
-    // Б. Загружаем динамические тексты и скачивания с бэкенда при входе на сайт
+    
     fetch(`${BACKEND_URL}/api/get-site-data`)
         .then(res => res.json())
         .then(data => {
-            // Обновляем цифру скачиваний актуальным значением
+            // 1. Обновляем счетчик скачиваний
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
+            } else {
+                updateScreenNumber(0);
             }
-            
-            // Синхронизируем тексты на странице с тем, что сохранено в админке
+
+            // 2. Обновляем все тексты, если они пришли с сервера
             if (data.texts) {
                 const h1 = document.querySelector('.hero h1, main h1, .main-screen h1');
-                if (h1 && data.texts.heroTitle) h1.innerHTML = data.texts.heroTitle;
+                if (h1 && data.texts.heroTitle) {
+                    // Подставляем фиолетовый цвет напрямую для слова "вашей"
+                    h1.innerHTML = data.texts.heroTitle.replace('вашей', '<span style="color: #a855f7;">вашей</span>');
+                }
 
                 const subtitle = document.querySelector('.hero p, main p, .main-screen p');
-                if (subtitle && data.texts.heroSubtitle) subtitle.innerText = data.texts.heroSubtitle;
+                if (subtitle && data.texts.heroSubtitle) {
+                    subtitle.innerText = data.texts.heroSubtitle;
+                }
 
-                // Разделяем кнопки: в шапке всегда "Скачать", по центру — "Установить приложение" из базы
                 const headerBtn = document.querySelector('.cta-header-btn');
-                const heroBtn = document.querySelector('.btn-primary');
-
                 if (headerBtn) {
                     headerBtn.innerText = 'Скачать';
                 }
+
+                const heroBtn = document.querySelector('.btn-primary');
                 if (heroBtn && data.texts.btnInstall) {
                     heroBtn.innerText = data.texts.btnInstall;
                 }
 
                 const timerTitle = document.querySelector('.timer-title');
-                if (timerTitle && data.texts.timerTitle) timerTitle.innerText = data.texts.timerTitle;
+                if (timerTitle && data.texts.timerTitle) {
+                    timerTitle.innerText = data.texts.timerTitle;
+                }
 
                 const counterTitle = document.querySelector('.counter-title');
-                if (counterTitle && data.texts.counterTitle) counterTitle.innerText = data.texts.counterTitle;
+                if (counterTitle && data.texts.counterTitle) {
+                    counterTitle.innerText = data.texts.counterTitle;
+                }
             }
         })
         .catch(err => console.error('Ошибка загрузки данных сайта:', err));
 
-    // В. Обработка клика по кнопкам платформ
+    
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            event.preventDefault(); // Блокируем переход по пустой ссылке
+            event.preventDefault();
 
             const releaseDate = new Date('2026-09-01T00:00:00');
             const currentDate = new Date(); 
 
-            // Если релиз еще не наступил — активируем Liquid Glass поп-ап
+            
             if (currentDate < releaseDate) {
                 if (modal) modal.classList.add('active');
                 return; 
             }
 
-            // --- Этот код сработает строго после релиза ---
             if (isSubmitting) return; 
             isSubmitting = true;
 
@@ -128,11 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST'
             })
             .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    updateScreenNumber(data.totalDownloads); 
-                }
-            })
             .catch(err => console.error('Ошибка отправки клика на server:', err))
             .finally(() => {
                 setTimeout(() => { isSubmitting = false; }, 300);
