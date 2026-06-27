@@ -139,20 +139,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => { isSubmitting = false; }, 300);
                
         
+
 const scrollTopBtn = document.getElementById('scroll-to-top');
-const benefitsSection = document.getElementById('benefits');
 
-if (scrollTopBtn && benefitsSection) {
+if (scrollTopBtn) {
     window.addEventListener('scroll', () => {
-        const benefitsBottom = benefitsSection.getBoundingClientRect().bottom;
-
-        if (benefitsBottom < 0) {
+        
+        if (window.scrollY > 300) {
             scrollTopBtn.classList.add('visible');
         } else {
             scrollTopBtn.classList.remove('visible');
         }
     });
 
+    
     scrollTopBtn.addEventListener('click', () => {
         window.scrollTo({
             top: 0,
