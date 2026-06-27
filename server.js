@@ -8,7 +8,6 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-
 let siteData = {
     totalDownloads: 0,
     totalVisits: 0,
@@ -21,7 +20,6 @@ let siteData = {
     }
 };
 
-
 const ADMIN_USERS = {
     "math_solvers": "mZ9$vK2xQ7pW_math",
     "loikbruni":     "bR8!nX4vL1pQ_loik",
@@ -33,7 +31,6 @@ const ADMIN_USERS = {
 };
 
 let activeSessions = new Set();
-
 
 function getDeterministicSecret(username, password) {
     const hash = crypto.createHmac('sha256', password).update(username).digest('hex');
@@ -51,11 +48,14 @@ app.post('/api/track-visit', (req, res) => {
     res.json({ success: true, totalVisits: siteData.totalVisits });
 });
 
+app.get('/api/track-visit', (req, res) => {
+    res.json({ success: true, totalVisits: siteData.totalVisits, note: "GET fallback for Vercel routing" });
+});
+
 app.post('/api/increment-downloads', (req, res) => {
     siteData.totalDownloads++;
     res.json({ success: true, totalDownloads: siteData.totalDownloads });
 });
-
 
 app.post('/api/admin/login-password', (req, res) => {
     const { username, password } = req.body;
@@ -69,7 +69,6 @@ app.post('/api/admin/login-password', (req, res) => {
         return res.json({ success: true, step: "verify_2fa", qrCode: dataUrl });
     });
 });
-
 
 app.post('/api/admin/verify-2fa', (req, res) => {
     const { username, code } = req.body;
@@ -86,10 +85,8 @@ app.post('/api/admin/verify-2fa', (req, res) => {
     res.json({ success: true, sessionToken });
 });
 
-
 app.post('/api/admin/update-site', (req, res) => {
     const { sessionToken, totalDownloads, totalVisits, texts } = req.body;
-    
     const isSessionValid = sessionToken && (activeSessions.has(sessionToken) || sessionToken.length === 48);
 
     if (!isSessionValid) {
@@ -102,16 +99,13 @@ app.post('/api/admin/update-site', (req, res) => {
     res.json({ success: true, message: "Данные успешно обновлены!" });
 });
 
-
 app.post('/api/admin/reset-site', (req, res) => {
     const { sessionToken } = req.body;
-    
     const isSessionValid = sessionToken && (activeSessions.has(sessionToken) || sessionToken.length === 48);
     if (!isSessionValid) {
         return res.status(403).json({ success: false, message: "Ошибка доступа: сессия не валидна!" });
     }
 
-    
     siteData = {
         totalDownloads: 0,
         totalVisits: 0,
@@ -131,7 +125,9 @@ app.post('/api/admin/reset-site', (req, res) => {
 
 app.get('/', (req, res) => res.send('CraneApp Security API Node'));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
 
 module.exports = app;
