@@ -785,38 +785,30 @@ body {
     }
  
 
-.scroll-top-btn {
+button#scroll-to-top.scroll-top-btn {
     position: fixed !important;
     bottom: 30px !important;
-    left: auto !important; 
-    right: -70px !important;
-    
-    width: 44px !important;
-    height: 44px !important;
+    left: auto !important;
+    right: -100px !important;
+    width: 46px !important;
+    height: 46px !important;
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 50% !important;
-    
-    
     background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
     color: #ffffff !important;
     border: none !important;
     cursor: pointer !important;
-    
-   
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    
-   
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4) !important;
     opacity: 0 !important;
     z-index: 99999 !important;
     transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, transform 0.2s !important;
 }
 
-
-.arrow-up {
+button#scroll-to-top.scroll-top-btn .arrow-up {
     width: 10px !important;
     height: 10px !important;
     border-top: 2.5px solid #ffffff !important;
@@ -826,19 +818,17 @@ body {
     box-sizing: border-box !important;
 }
 
-
-.scroll-top-btn.visible {
-    right: 25px !important;
+button#scroll-to-top.scroll-top-btn.visible {
+    right: 30px !important;
     opacity: 1 !important;
 }
 
-
-.scroll-top-btn:hover {
+button#scroll-to-top.scroll-top-btn:hover {
     transform: translateY(-4px) scale(1.05) !important;
-    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.5) !important;
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.6) !important;
 }
 
-.scroll-top-btn:active {
+button#scroll-to-top.scroll-top-btn:active {
     transform: translateY(-1px) scale(0.98) !important;
 }
 
