@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseBtn = document.getElementById('modal-close-btn');
     let isSubmitting = false;
 
-    // Специфичные кнопки для скачивания конкретных платформ (внутри секции #download)
-    // Исключаем кнопки из шапки, чтобы они просто скроллили сайт вниз к секции скачивания
+   
     const platformButtons = document.querySelectorAll('.btn-platform, .btn-download, #download a, #download button'); 
 
     function updateScreenNumber(num) {
@@ -60,11 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Трекер визитов (защищенный)
+    
     fetch(`${BACKEND_URL}/api/track-visit`, { method: 'POST' })
         .catch(err => console.error('Ошибка трекера заходов:', err));
 
-    // Безопасное получение данных с валидацией JSON
+    
     fetch(`${BACKEND_URL}/api/get-site-data`)
         .then(res => {
             if (!res.ok) throw new Error('Ошибка сервера при получении данных');
@@ -73,14 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (!data) return;
 
-            // 1. Обновляем счетчик скачиваний
+            
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
             } else {
                 updateScreenNumber(0);
             }
 
-            // 2. Обновляем все тексты, если они пришли с сервера
+            
             if (data.texts) {
                 const h1 = document.querySelector('.hero h1, main h1, .main-screen h1');
                 if (h1 && data.texts.heroTitle) {
@@ -115,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error('Локальный режим безопасности (Сервер офлайн):', err));
 
-    // Обработчик нажатия на кнопки конкретных платформ
+    
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
@@ -138,6 +137,31 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error('Ошибка отправки клика на server:', err))
             .finally(() => {
                 setTimeout(() => { isSubmitting = false; }, 300);
+               
+const scrollTopBtn = document.getElementById('scroll-to-top');
+const benefitsSection = document.getElementById('benefits');
+
+if (scrollTopBtn && benefitsSection) {
+    window.addEventListener('scroll', () => {
+        
+        const benefitsBottom = benefitsSection.getBoundingClientRect().bottom;
+
+       
+        if (benefitsBottom < 0) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    });
+
+    
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
             });
         });
     });

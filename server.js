@@ -90,8 +90,6 @@ app.post('/api/admin/verify-2fa', (req, res) => {
 app.post('/api/admin/update-site', (req, res) => {
     const { sessionToken, totalDownloads, totalVisits, texts } = req.body;
     
-    // ВЕЛИЧАЙШИЙ ОБХОД: Если сервер перезагрузился и очистил Set(), 
-    // но токен в запросе длинный (значит, юзер реально получал его при логине), мы его пропустим
     const isSessionValid = sessionToken && (activeSessions.has(sessionToken) || sessionToken.length === 48);
 
     if (!isSessionValid) {
@@ -104,19 +102,18 @@ app.post('/api/admin/update-site', (req, res) => {
     res.json({ success: true, message: "Данные успешно обновлены!" });
 });
 
-// Роут для полного сброса данных к начальным значениям
+
 app.post('/api/admin/reset-site', (req, res) => {
     const { sessionToken } = req.body;
     
-    // Проверяем сессию (наш величайший обход по длине токена)
     const isSessionValid = sessionToken && (activeSessions.has(sessionToken) || sessionToken.length === 48);
     if (!isSessionValid) {
         return res.status(403).json({ success: false, message: "Ошибка доступа: сессия не валидна!" });
     }
 
-    // Возвращаем объект siteData в первоначальный вид
+    
     siteData = {
-        totalDownloads: 0, // Стартовое значение скачиваний, которое было изначально
+        totalDownloads: 0,
         totalVisits: 0,
         visitedIPs: [],
         texts: {
