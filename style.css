@@ -784,48 +784,62 @@ body {
         gap: 8px !important;
     }
  
+
 .scroll-top-btn {
-    position: fixed;
-    bottom: 30px;
-    right: -60px; 
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); 
-    color: #ffffff;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-    opacity: 0;
-    z-index: 9999;
-    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, transform 0.2s;
+    position: fixed !important;
+    bottom: 30px !important;
+    left: auto !important; 
+    right: -70px !important;
+    
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    
+    
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    cursor: pointer !important;
+    
+   
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+   
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
+    opacity: 0 !important;
+    z-index: 99999 !important;
+    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, transform 0.2s !important;
 }
 
 
 .arrow-up {
-    width: 12px;
-    height: 12px;
-    border-top: 3px solid #ffffff;
-    border-left: 3px solid #ffffff;
-    transform: rotate(45deg) translate(2px, 2px);
-    display: block;
+    width: 10px !important;
+    height: 10px !important;
+    border-top: 2.5px solid #ffffff !important;
+    border-left: 2.5px solid #ffffff !important;
+    transform: rotate(45deg) translate(1px, 1px) !important;
+    display: block !important;
+    box-sizing: border-box !important;
 }
+
 
 .scroll-top-btn.visible {
-    right: 30px;
-    opacity: 1;
+    right: 25px !important;
+    opacity: 1 !important;
 }
 
+
 .scroll-top-btn:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+    transform: translateY(-4px) scale(1.05) !important;
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.5) !important;
 }
 
 .scroll-top-btn:active {
-    transform: translateY(-2px) scale(0.98);
+    transform: translateY(-1px) scale(0.98) !important;
 }
+
 }
