@@ -138,30 +138,30 @@ document.addEventListener('DOMContentLoaded', () => {
             .finally(() => {
                 setTimeout(() => { isSubmitting = false; }, 300);
                
-const scrollTopBtn = document.getElementById('scroll-to-top');
-const benefitsSection = document.getElementById('benefits');
+document.addEventListener('DOMContentLoaded', () => {
+    const scrollTopBtn = document.getElementById('scroll-to-top');
+    const benefitsSection = document.getElementById('benefits');
 
-if (scrollTopBtn && benefitsSection) {
-    window.addEventListener('scroll', () => {
-        
-        const benefitsBottom = benefitsSection.getBoundingClientRect().bottom;
+    if (scrollTopBtn && benefitsSection) {
+        window.addEventListener('scroll', () => {
+            const benefitsBottom = benefitsSection.getBoundingClientRect().bottom;
 
-       
-        if (benefitsBottom < 0) {
-            scrollTopBtn.classList.add('visible');
-        } else {
-            scrollTopBtn.classList.remove('visible');
-        }
-    });
-
-    
-    scrollTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+            
+            if (benefitsBottom < 0) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
         });
-    });
-}
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
             });
         });
     });
