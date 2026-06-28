@@ -174,17 +174,17 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const scrollTopBtn = document.getElementById('scroll-to-top');
-        const benefitsSection = document.getElementById('benefits');
+        const triggerSection = document.getElementById('instruction');
 
-        if (scrollTopBtn && benefitsSection) {
-            // Кнопка появляется, как только верхняя граница #benefits
+        if (scrollTopBtn && triggerSection) {
+            // Кнопка появляется, как только верхняя граница #instruction
             // оказывается выше нижней границы экрана (то есть секция
-            // "Почему нам доверяют" хотя бы немного видна), и остаётся
-            // видимой при дальнейшем скролле, скрываясь только если
-            // вернулись выше этой точки.
+            // "Три шага к полной приватности" хотя бы немного видна), и
+            // остаётся видимой при дальнейшем скролле, скрываясь только
+            // если вернулись выше этой точки.
             const checkScrollPosition = () => {
-                const benefitsTop = benefitsSection.getBoundingClientRect().top;
-                if (benefitsTop <= window.innerHeight) {
+                const triggerTop = triggerSection.getBoundingClientRect().top;
+                if (triggerTop <= window.innerHeight) {
                     scrollTopBtn.classList.add('visible');
                 } else {
                     scrollTopBtn.classList.remove('visible');
