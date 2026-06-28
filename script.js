@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     const targetDate = new Date('September 1, 2026 00:00:00').getTime();
+
+    // Объявляем интервал заранее (let, не const), чтобы updateCountdown
+    // мог безопасно обратиться к нему даже при самом первом вызове —
+    // раньше тут была ReferenceError при разнице времени <= 0,
+    // потому что countdownInterval ещё не существовал на момент
+    // первого updateCountdown().
+    let countdownInterval;
 
     function updateCountdown() {
         const now = new Date().getTime();
@@ -11,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('hours').innerText = '00';
             document.getElementById('minutes').innerText = '00';
             document.getElementById('seconds').innerText = '00';
-            clearInterval(countdownInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
             return;
         }
 
@@ -27,17 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateCountdown();
-    const countdownInterval = setInterval(updateCountdown, 1000);
+    countdownInterval = setInterval(updateCountdown, 1000);
 
     const counterElement = document.querySelector('.stat-number');
-    const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
+
+    // Относительный путь вместо хардкода домена — работает одинаково
+    // на проде, на preview-деплоях Vercel и локально, раз фронтенд
+    // и бэкенд задеплоены в одном проекте.
+    const BACKEND_URL = '';
 
     const modal = document.getElementById('release-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     let isSubmitting = false;
 
-   
-    const platformButtons = document.querySelectorAll('.btn-platform, .btn-download, #download a, #download button'); 
+    const platformButtons = document.querySelectorAll('.btn-download');
 
     function updateScreenNumber(num) {
         if (counterElement) {
@@ -59,11 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    
     fetch(`${BACKEND_URL}/api/track-visit`, { method: 'POST' })
         .catch(err => console.error('Ошибка трекера заходов:', err));
 
-    
     fetch(`${BACKEND_URL}/api/get-site-data`)
         .then(res => {
             if (!res.ok) throw new Error('Ошибка сервера при получении данных');
@@ -72,62 +80,80 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (!data) return;
 
-            
             if (data.totalDownloads !== undefined) {
                 updateScreenNumber(data.totalDownloads);
             } else {
                 updateScreenNumber(0);
             }
 
-            
             if (data.texts) {
+                // Используем textContent вместо innerHTML — текст с сервера
+                // не должен интерпретироваться как HTML (риск XSS, если
+                // кто-то получит доступ к админке или обойдёт её защиту).
+                // Подсветку слова "вашей" делаем через DOM, а не через
+                // вставку сырого HTML-фрагмента.
                 const h1 = document.querySelector('.hero h1, main h1, .main-screen h1');
                 if (h1 && data.texts.heroTitle) {
-                    h1.innerHTML = data.texts.heroTitle.replace('вашей', '<span style="color: #a855f7;">вашей</span>');
+                    const title = data.texts.heroTitle;
+                    const marker = 'вашей';
+                    const idx = title.indexOf(marker);
+
+                    h1.textContent = '';
+                    if (idx === -1) {
+                        h1.textContent = title;
+                    } else {
+                        h1.append(
+                            document.createTextNode(title.slice(0, idx)),
+                            Object.assign(document.createElement('span'), {
+                                style: 'color:#a855f7',
+                                textContent: title.slice(idx, idx + marker.length)
+                            }),
+                            document.createTextNode(title.slice(idx + marker.length))
+                        );
+                    }
                 }
 
                 const subtitle = document.querySelector('.hero p, main p, .main-screen p');
                 if (subtitle && data.texts.heroSubtitle) {
-                    subtitle.innerText = data.texts.heroSubtitle;
+                    subtitle.textContent = data.texts.heroSubtitle;
                 }
 
                 const headerBtn = document.querySelector('.cta-header-btn');
                 if (headerBtn) {
-                    headerBtn.innerText = 'Скачать';
+                    headerBtn.textContent = 'Скачать';
                 }
 
                 const heroBtn = document.querySelector('.btn-primary');
                 if (heroBtn && data.texts.btnInstall) {
-                    heroBtn.innerText = data.texts.btnInstall;
+                    heroBtn.textContent = data.texts.btnInstall;
                 }
 
                 const timerTitle = document.querySelector('.timer-title');
                 if (timerTitle && data.texts.timerTitle) {
-                    timerTitle.innerText = data.texts.timerTitle;
+                    timerTitle.textContent = data.texts.timerTitle;
                 }
 
                 const counterTitle = document.querySelector('.counter-title');
                 if (counterTitle && data.texts.counterTitle) {
-                    counterTitle.innerText = data.texts.counterTitle;
+                    counterTitle.textContent = data.texts.counterTitle;
                 }
             }
         })
         .catch(err => console.error('Локальный режим безопасности (Сервер офлайн):', err));
 
-    
     platformButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
 
             const releaseDate = new Date('2026-09-01T00:00:00');
-            const currentDate = new Date(); 
+            const currentDate = new Date();
 
             if (currentDate < releaseDate) {
                 if (modal) modal.classList.add('active');
-                return; 
+                return;
             }
 
-            if (isSubmitting) return; 
+            if (isSubmitting) return;
             isSubmitting = true;
 
             fetch(`${BACKEND_URL}/api/increment-downloads`, {
@@ -137,9 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error('Ошибка отправки клика на server:', err))
             .finally(() => {
                 setTimeout(() => { isSubmitting = false; }, 300);
-               
-        
+            });
+        });
+    });
+});
 
+// Вынесено в отдельный, независимый блок — раньше этот код был случайно
+// вложен внутрь обработчика клика по кнопкам платформ (внутри predicate
+// выше), из-за чего кнопка "наверх" настраивалась бы только после первого
+// клика по кнопке скачивания, а не сразу при загрузке страницы.
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const scrollTopBtn = document.getElementById('scroll-to-top');
@@ -162,9 +194,4 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error(e);
     }
-});
-
-            });
-        });
-    });
 });
