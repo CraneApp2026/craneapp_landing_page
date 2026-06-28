@@ -38,10 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const counterElement = document.querySelector('.stat-number');
 
-    // Относительный путь вместо хардкода домена — работает одинаково
-    // на проде, на preview-деплоях Vercel и локально, раз фронтенд
-    // и бэкенд задеплоены в одном проекте.
-    const BACKEND_URL = '';
+    // Абсолютный URL, так как фронтенд (GitHub Pages) и бэкенд (Vercel)
+    // задеплоены на разных доменах — относительный путь здесь не сработает.
+    const BACKEND_URL = 'https://craneapp-landing-page.vercel.app';
 
     const modal = document.getElementById('release-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -175,7 +174,33 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const scrollTopBtn = document.getElementById('scroll-to-top');
-        if (scrollTopBtn) {
+        const benefitsSection = document.getElementById('benefits');
+
+        if (scrollTopBtn && benefitsSection) {
+            // Кнопка появляется, как только верхняя граница #benefits
+            // оказывается выше нижней границы экрана (то есть секция
+            // "Почему нам доверяют" хотя бы немного видна), и остаётся
+            // видимой при дальнейшем скролле, скрываясь только если
+            // вернулись выше этой точки.
+            const checkScrollPosition = () => {
+                const benefitsTop = benefitsSection.getBoundingClientRect().top;
+                if (benefitsTop <= window.innerHeight) {
+                    scrollTopBtn.classList.add('visible');
+                } else {
+                    scrollTopBtn.classList.remove('visible');
+                }
+            };
+
+            window.addEventListener('scroll', checkScrollPosition);
+            checkScrollPosition(); // на случай, если страница открыта не с самого верха
+
+            scrollTopBtn.addEventListener('click', () => {
+                document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+            });
+        } else if (scrollTopBtn) {
+            // Запасной вариант, если секция #benefits почему-то не найдена —
+            // используем старое поведение по порогу скролла, чтобы кнопка
+            // в любом случае не осталась полностью нерабочей.
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 300) {
                     scrollTopBtn.classList.add('visible');
@@ -185,10 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             scrollTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
     } catch (e) {

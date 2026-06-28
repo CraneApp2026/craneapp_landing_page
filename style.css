@@ -784,6 +784,7 @@ body {
         gap: 8px !important;
     }
  
+}
 
 button#scroll-to-top.scroll-top-btn {
     position: fixed !important;
@@ -830,6 +831,4 @@ button#scroll-to-top.scroll-top-btn:hover {
 
 button#scroll-to-top.scroll-top-btn:active {
     transform: translateY(-1px) scale(0.98) !important;
-}
-
 }
