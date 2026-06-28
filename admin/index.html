@@ -259,19 +259,23 @@
             currentUsername = document.getElementById('auth-user').value;
             const pass = document.getElementById('auth-pass').value;
             const status = document.getElementById('auth-status');
+            status.innerText = "";
 
             fetch(BACKEND_URL + '/api/admin/login-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: currentUsername, password: pass })
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.json().then(data => ({ status: res.status, data })))
+            .then(({ status: httpStatus, data }) => {
                 if (data.success) {
                     document.getElementById('credentials-fields').style.display = 'none';
                     document.getElementById('totp-field-group').style.display = 'block';
+                } else if (httpStatus === 429) {
+                    status.innerText = "⏳ Слишком много попыток. Подождите 15 минут.";
+                    status.style.color = "#ef4444";
                 } else {
-                    status.innerText = "❌ Ошибка авторизации";
+                    status.innerText = "❌ " + (data.message || "Ошибка авторизации");
                     status.style.color = "#ef4444";
                 }
             }).catch(() => { 
@@ -287,14 +291,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: currentUsername, code: code })
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.json().then(data => ({ status: res.status, data })))
+            .then(({ status: httpStatus, data }) => {
                 if(data.success) {
                     globalSessionToken = data.sessionToken;
                     localStorage.setItem('crane_session', data.sessionToken);
                     document.getElementById('auth-block').style.display = 'none';
                     document.getElementById('admin-block').style.display = 'block';
                     loadData();
+                } else if (httpStatus === 429) {
+                    document.getElementById('auth-status').innerText = "⏳ Слишком много попыток. Подождите 15 минут.";
+                } else {
+                    document.getElementById('auth-status').innerText = "❌ " + (data.message || "Неверный код 2FA");
                 }
             }).catch(() => {
                 document.getElementById('auth-status').innerText = "❌ Ошибка проверки 2FA";
