@@ -166,6 +166,30 @@
             <span style="color: #7e7d9c;">Нажмите «Обновить список», чтобы загрузить подписчиков.</span>
         </div>
 
+        <div class="section-title">📣 Рассылка уведомления о релизе</div>
+        <div style="background:#18172c;border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:24px;margin-bottom:8px;">
+            <div class="form-group">
+                <label>Платформа <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="email-platform" placeholder="Например: App Store, Google Play, RuStore…">
+            </div>
+            <div class="form-group">
+                <label>Тема письма <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="email-subject" placeholder="🚀 CraneApp доступен в App Store!">
+            </div>
+            <div class="form-group">
+                <label>Текст письма <span style="color:#ef4444;">*</span></label>
+                <textarea id="email-body" style="min-height:120px;" placeholder="Привет! Мы рады сообщить, что CraneApp теперь доступен для скачивания…"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Ссылка для скачивания (необязательно)</label>
+                <input type="url" id="email-download-url" placeholder="https://apps.apple.com/...">
+            </div>
+            <button class="btn-gradient" onclick="sendReleaseNotification()" id="send-blast-btn">
+                📨 Отправить всем подписчикам
+            </button>
+            <div class="status" id="blast-status"></div>
+        </div>
+
         <div class="section-title">📊 Накрутка / Корректировка цифр</div>
         <div class="stats-grid">
             <div class="form-group">
@@ -481,6 +505,69 @@
                     showCancel: false
                 });
             }
+        }
+
+        function sendReleaseNotification() {
+            const platform = document.getElementById('email-platform').value.trim();
+            const subject = document.getElementById('email-subject').value.trim();
+            const body = document.getElementById('email-body').value.trim();
+            const downloadUrl = document.getElementById('email-download-url').value.trim();
+            const statusEl = document.getElementById('blast-status');
+            const btn = document.getElementById('send-blast-btn');
+
+            statusEl.innerText = '';
+            statusEl.style.color = '#b07ff0';
+
+            if (!platform || !subject || !body) {
+                statusEl.innerText = '❌ Заполните платформу, тему и текст письма';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+
+            openModal({
+                icon: '📨',
+                title: 'Подтвердите рассылку',
+                text: `Отправить письмо «${subject}» всем подписчикам?`,
+                showCancel: true,
+                onConfirm: () => {
+                    btn.disabled = true;
+                    statusEl.innerText = '⏳ Отправляем...';
+                    statusEl.style.color = '#b07ff0';
+
+                    fetch(BACKEND_URL + '/api/admin/send-release-notification', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionToken: globalSessionToken,
+                            platform,
+                            subject,
+                            body,
+                            downloadUrl
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            statusEl.innerText = `✅ ${data.message}`;
+                            statusEl.style.color = '#22c55e';
+                            openModal({
+                                icon: '🎉',
+                                title: 'Рассылка завершена!',
+                                text: data.message,
+                                showCancel: false
+                            });
+                        } else {
+                            statusEl.innerText = `❌ ${data.message}`;
+                            statusEl.style.color = '#ef4444';
+                        }
+                    })
+                    .catch(() => {
+                        statusEl.innerText = '❌ Ошибка соединения с сервером';
+                        statusEl.style.color = '#ef4444';
+                    })
+                    .finally(() => { btn.disabled = false; });
+                }
+            });
         }
 
         window.onload = function() {
