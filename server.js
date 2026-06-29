@@ -5,6 +5,7 @@ const qrcode = require('qrcode');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { Redis } = require('@upstash/redis');
+const { Resend } = require('resend');
 
 // Vercel KV (старый продукт) был выведен из эксплуатации; теперь Vercel
 // использует Upstash Redis через маркетплейс. Upstash прокидывает в
@@ -15,6 +16,12 @@ const kv = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN
 });
+
+// Resend используется для рассылки email-уведомлений подписчикам.
+// RESEND_API_KEY нужно добавить в переменные окружения Vercel.
+// Отправитель: домен, который вы верифицировали в Resend (или onboarding@resend.dev для тестов).
+const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_FROM = process.env.EMAIL_FROM || 'CraneApp <onboarding@resend.dev>';
 
 const app = express();
 app.use(cors({ origin: '*' }));
@@ -375,7 +382,123 @@ app.post('/api/admin/subscribers', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => res.send('CraneApp Security API Node'));
+// -----------------------------------------------------------------------
+// Routes: admin email blast
+// -----------------------------------------------------------------------
+
+// Максимальное число получателей в одном вызове Resend (лимит batch API).
+// При большой базе подписчиков разбиваем на чанки.
+const RESEND_BATCH_SIZE = 100;
+
+// Хелпер: генерирует HTML-тело письма о релизе
+function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
+    const safePlatform = platform.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeBody = body.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    const btnHtml = downloadUrl
+        ? `<a href="${downloadUrl}" style="display:inline-block;margin-top:24px;padding:14px 32px;background:#8b5cf6;color:#fff;text-decoration:none;border-radius:50px;font-weight:600;font-size:1rem;">Скачать CraneApp</a>`
+        : '';
+
+    return `<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0b0a1d;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b0a1d;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#131224;border-radius:20px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#4f2dc8 0%,#8b5cf6 100%);padding:32px;text-align:center;">
+            <p style="margin:0;font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:-0.5px;">🚀 CraneApp</p>
+            <p style="margin:8px 0 0;font-size:0.95rem;color:rgba(255,255,255,0.75);">Уведомление о релизе</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;">
+            <p style="margin:0 0 8px;font-size:0.82rem;color:#7e7d9c;text-transform:uppercase;letter-spacing:1px;">Платформа</p>
+            <p style="margin:0 0 24px;font-size:1.2rem;font-weight:700;color:#b07ff0;">${safePlatform}</p>
+            <p style="margin:0;font-size:1rem;color:#c8c7e0;line-height:1.7;">${safeBody}</p>
+            ${btnHtml}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px 28px;border-top:1px solid rgba(255,255,255,0.06);">
+            <p style="margin:0;font-size:0.8rem;color:#4a4865;text-align:center;">
+              Вы получили это письмо, так как подписались на уведомления на сайте CraneApp.<br>
+              Если вы не хотите получать уведомления — просто проигнорируйте это письмо.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+app.post('/api/admin/send-release-notification', async (req, res) => {
+    try {
+        const { sessionToken, platform, subject, body, downloadUrl } = req.body;
+        const username = await validateSession(sessionToken);
+
+        if (!username) {
+            return res.status(403).json({ success: false, message: 'Ошибка доступа: сессия не валидна!' });
+        }
+
+        if (!platform || typeof platform !== 'string' || platform.trim().length === 0) {
+            return res.status(400).json({ success: false, message: 'Укажите платформу (например, App Store, Google Play)' });
+        }
+        if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
+            return res.status(400).json({ success: false, message: 'Укажите тему письма' });
+        }
+        if (!body || typeof body !== 'string' || body.trim().length === 0) {
+            return res.status(400).json({ success: false, message: 'Укажите текст письма' });
+        }
+
+        const subscribers = await kv.smembers(SUBSCRIBERS_KEY);
+        if (!subscribers || subscribers.length === 0) {
+            return res.json({ success: false, message: 'Нет подписчиков для рассылки' });
+        }
+
+        const html = buildReleaseEmailHtml({
+            platform: platform.trim(),
+            subject: subject.trim(),
+            body: body.trim(),
+            downloadUrl: downloadUrl?.trim() || ''
+        });
+
+        // Отправляем батчами, чтобы не превышать лимит Resend
+        let sent = 0;
+        let failed = 0;
+        for (let i = 0; i < subscribers.length; i += RESEND_BATCH_SIZE) {
+            const chunk = subscribers.slice(i, i + RESEND_BATCH_SIZE);
+            const messages = chunk.map(email => ({
+                from: EMAIL_FROM,
+                to: [email],
+                subject: subject.trim(),
+                html
+            }));
+
+            try {
+                await resend.batch.send(messages);
+                sent += chunk.length;
+            } catch (batchErr) {
+                console.error('Ошибка батча Resend:', batchErr);
+                failed += chunk.length;
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Рассылка завершена: отправлено ${sent}, ошибок ${failed}`,
+            sent,
+            failed
+        });
+    } catch (err) {
+        console.error('Ошибка рассылки:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера при рассылке' });
+    }
+});
+
+
 
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
