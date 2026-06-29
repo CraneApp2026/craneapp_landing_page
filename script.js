@@ -181,6 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
             subscribeStatus.classList.remove('success', 'error');
             subscribeStatus.textContent = '';
 
+            // Проверяем что капча пройдена
+            const recaptchaToken = grecaptcha.getResponse();
+            if (!recaptchaToken) {
+                subscribeStatus.textContent = '⚠️ Пожалуйста, подтвердите что вы не робот';
+                subscribeStatus.classList.add('error');
+                return;
+            }
+
             isSubscribing = true;
             const submitBtn = subscribeForm.querySelector('.subscribe-btn');
             if (submitBtn) submitBtn.disabled = true;
@@ -188,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch(`${BACKEND_URL}/api/subscribe`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
+                body: JSON.stringify({ email, recaptchaToken })
             })
             .then(res => res.json().then(data => ({ ok: res.ok, data })))
             .then(({ ok, data }) => {
@@ -196,9 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     subscribeStatus.textContent = '✓ Спасибо! Мы напишем вам о релизе.';
                     subscribeStatus.classList.add('success');
                     emailInput.value = '';
+                    grecaptcha.reset();
                 } else {
                     subscribeStatus.textContent = data.message || 'Не удалось подписаться. Попробуйте позже.';
                     subscribeStatus.classList.add('error');
+                    grecaptcha.reset();
                 }
             })
             .catch(() => {

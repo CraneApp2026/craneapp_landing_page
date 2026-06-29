@@ -170,10 +170,23 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 app.post('/api/subscribe', async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, recaptchaToken } = req.body;
 
         if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
             return res.status(400).json({ success: false, message: 'Введите корректный email' });
+        }
+
+        // Проверяем reCAPTCHA токен через Google API
+        if (!recaptchaToken) {
+            return res.status(400).json({ success: false, message: 'Пройдите проверку капчи' });
+        }
+        const captchaRes = await fetch(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+            { method: 'POST' }
+        );
+        const captchaData = await captchaRes.json();
+        if (!captchaData.success) {
+            return res.status(400).json({ success: false, message: 'Проверка капчи не пройдена. Попробуйте ещё раз.' });
         }
 
         const normalizedEmail = email.trim().toLowerCase();

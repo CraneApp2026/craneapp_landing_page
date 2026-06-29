@@ -13,6 +13,7 @@
      
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script> 
 <link rel="stylesheet" href="style.css"> 
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head> 
 <body> 
  
@@ -235,6 +236,9 @@
                 <input type="email" id="subscribe-email" class="subscribe-input" placeholder="you@example.com" required>
                 <button type="submit" class="btn-primary subscribe-btn">Подписаться</button>
             </form>
+            <div style="margin-top:16px;display:flex;justify-content:center;">
+                <div class="g-recaptcha" data-sitekey="6Lc2hTstAAAAAKJPSsnDbe0ID9tSmIhmpO_Iz95W" data-theme="dark"></div>
+            </div>
             <div class="subscribe-status" id="subscribe-status"></div>
         </div>
     </section>
