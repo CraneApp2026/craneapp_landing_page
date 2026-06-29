@@ -427,6 +427,64 @@ body {
     text-align: center; 
 }
 
+.subscribe-section {
+    max-width: 700px;
+    margin: 0 auto 140px auto;
+    padding: 0 6%;
+    text-align: center;
+}
+
+.subscribe-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    margin-bottom: 32px;
+    margin-top: -24px;
+}
+
+.subscribe-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.subscribe-input {
+    flex: 1;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    padding: 14px 24px;
+    border-radius: 100px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.subscribe-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.subscribe-input:focus {
+    border-color: rgba(168, 85, 247, 0.6);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.subscribe-btn {
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.subscribe-status {
+    margin-top: 16px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+.subscribe-status.success { color: #4ade80; }
+.subscribe-status.error { color: #f87171; }
+
 .download-buttons-container {
     display: flex;
     justify-content: center;
@@ -673,6 +731,11 @@ body {
     .btn-download { width: 100%; justify-content: center; }
     .download-section { margin: 60px auto 80px auto; }
 
+    .subscribe-section { margin: 0 auto 80px auto; }
+    .subscribe-form { flex-direction: column; width: 100%; }
+    .subscribe-input { width: 100%; max-width: 100%; }
+    .subscribe-btn { width: 100%; }
+
     .marquee-container { padding: 16px 0; margin: 40px 0; }
     .marquee-item { font-size: 32px; }
     .marquee-logo { width: 32px; height: 32px; }
@@ -784,7 +847,6 @@ body {
         gap: 8px !important;
     }
  
-}
 
 button#scroll-to-top.scroll-top-btn {
     position: fixed !important;
@@ -831,4 +893,6 @@ button#scroll-to-top.scroll-top-btn:hover {
 
 button#scroll-to-top.scroll-top-btn:active {
     transform: translateY(-1px) scale(0.98) !important;
+}
+
 }

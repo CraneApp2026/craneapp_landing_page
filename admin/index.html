@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CraneApp — Крипто-Панель</title>
+    <link rel="icon" type="image/png" href="images/craneapp-circle.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -153,6 +154,16 @@
                 <div class="stat-title">🕹️ Всего скачиваний</div>
                 <div class="stat-num" id="download-val">0</div>
             </div>
+            <div class="stat-box">
+                <div class="stat-title">✉️ Email-подписчики</div>
+                <div class="stat-num" id="subscribers-val">0</div>
+            </div>
+        </div>
+
+        <div class="section-title">✉️ Список email-подписчиков</div>
+        <button class="btn-gradient" onclick="loadSubscribers()" style="margin-bottom: 12px;">🔄 Обновить список</button>
+        <div id="subscribers-list" style="max-height: 240px; overflow-y: auto; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; font-size: 14px; line-height: 1.8;">
+            <span style="color: #7e7d9c;">Нажмите «Обновить список», чтобы загрузить подписчиков.</span>
         </div>
 
         <div class="section-title">📊 Накрутка / Корректировка цифр</div>
@@ -343,6 +354,45 @@
                 .catch(() => {
                     console.log("Локальный режим безопасности активирован (сервер офлайн).");
                 });
+
+            loadSubscribers();
+        }
+
+        function loadSubscribers() {
+            const listEl = document.getElementById('subscribers-list');
+            listEl.innerHTML = '<span style="color: #7e7d9c;">⏳ Загрузка...</span>';
+
+            fetch(BACKEND_URL + '/api/admin/subscribers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionToken: globalSessionToken })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('subscribers-val').innerText = data.count || 0;
+
+                    if (!data.subscribers || data.subscribers.length === 0) {
+                        listEl.innerHTML = '<span style="color: #7e7d9c;">Пока нет подписчиков.</span>';
+                        return;
+                    }
+
+                    // Используем textContent через createElement, а не innerHTML
+                    // с конкатенацией строк — email приходят от пользователей
+                    // сайта, и не должны интерпретироваться как HTML.
+                    listEl.innerHTML = '';
+                    data.subscribers.forEach(email => {
+                        const row = document.createElement('div');
+                        row.textContent = email;
+                        listEl.appendChild(row);
+                    });
+                } else {
+                    listEl.innerHTML = '<span style="color: #ef4444;">❌ Не удалось загрузить список</span>';
+                }
+            })
+            .catch(() => {
+                listEl.innerHTML = '<span style="color: #ef4444;">❌ Ошибка соединения</span>';
+            });
         }
 
         function saveChanges() {

@@ -39,6 +39,7 @@ const DEFAULT_SITE_DATA = {
 
 const SITE_DATA_KEY = 'site:data';
 const VISITED_IPS_KEY = 'site:visited-ips'; // Redis Set
+const SUBSCRIBERS_KEY = 'site:subscribers'; // Redis Set of emails
 const SESSION_PREFIX = 'session:'; // session:<token> -> username, with TTL
 const ADMIN_PREFIX = 'admin:'; // admin:<username> -> { passwordHash, totpSecret }
 const SESSION_TTL_SECONDS = 60 * 60; // 1 hour
@@ -155,6 +156,38 @@ app.post('/api/increment-downloads', async (req, res) => {
     } catch (err) {
         console.error('Ошибка увеличения счётчика скачиваний:', err);
         res.status(500).json({ success: false });
+    }
+});
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+app.post('/api/subscribe', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
+            return res.status(400).json({ success: false, message: 'Введите корректный email' });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+        const rateLimitKey = `subscribe:${clientIP}`;
+
+        if (isRateLimited(rateLimitKey)) {
+            return res.status(429).json({ success: false, message: 'Слишком много попыток. Попробуйте позже.' });
+        }
+        recordAttempt(rateLimitKey);
+
+        const alreadySubscribed = await kv.sismember(SUBSCRIBERS_KEY, normalizedEmail);
+        if (alreadySubscribed) {
+            return res.json({ success: true, message: 'Вы уже подписаны!' });
+        }
+
+        await kv.sadd(SUBSCRIBERS_KEY, normalizedEmail);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Ошибка подписки на уведомления:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
     }
 });
 
@@ -322,6 +355,23 @@ app.post('/api/admin/logout', async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false });
+    }
+});
+
+app.post('/api/admin/subscribers', async (req, res) => {
+    try {
+        const { sessionToken } = req.body;
+        const username = await validateSession(sessionToken);
+
+        if (!username) {
+            return res.status(403).json({ success: false, message: 'Ошибка доступа: сессия не валидна!' });
+        }
+
+        const subscribers = await kv.smembers(SUBSCRIBERS_KEY);
+        res.json({ success: true, subscribers: subscribers || [], count: (subscribers || []).length });
+    } catch (err) {
+        console.error('Ошибка получения списка подписчиков:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
     }
 });
 

@@ -165,6 +165,52 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    const subscribeForm = document.getElementById('subscribe-form');
+    const subscribeStatus = document.getElementById('subscribe-status');
+    let isSubscribing = false;
+
+    if (subscribeForm) {
+        subscribeForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (isSubscribing) return;
+
+            const emailInput = document.getElementById('subscribe-email');
+            const email = emailInput.value.trim();
+
+            subscribeStatus.classList.remove('success', 'error');
+            subscribeStatus.textContent = '';
+
+            isSubscribing = true;
+            const submitBtn = subscribeForm.querySelector('.subscribe-btn');
+            if (submitBtn) submitBtn.disabled = true;
+
+            fetch(`${BACKEND_URL}/api/subscribe`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
+                    subscribeStatus.textContent = '✓ Спасибо! Мы напишем вам о релизе.';
+                    subscribeStatus.classList.add('success');
+                    emailInput.value = '';
+                } else {
+                    subscribeStatus.textContent = data.message || 'Не удалось подписаться. Попробуйте позже.';
+                    subscribeStatus.classList.add('error');
+                }
+            })
+            .catch(() => {
+                subscribeStatus.textContent = 'Ошибка соединения. Попробуйте позже.';
+                subscribeStatus.classList.add('error');
+            })
+            .finally(() => {
+                isSubscribing = false;
+                if (submitBtn) submitBtn.disabled = false;
+            });
+        });
+    }
 });
 
 // Вынесено в отдельный, независимый блок — раньше этот код был случайно
