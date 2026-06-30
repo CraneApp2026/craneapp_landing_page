@@ -434,71 +434,95 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
     const safePlatform = platform.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeBody = body.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     const safeDownloadUrl = downloadUrl ? downloadUrl.replace(/"/g, '%22') : '';
+
+    // Логотип хостится в репозитории на GitHub (raw-ссылка), т.к. почтовые
+    // клиенты не умеют подгружать локальные/относительные файлы.
+    const LOGO_URL = 'https://raw.githubusercontent.com/CraneApp2026/craneapp_landing_page/main/images/craneapp-circle.png';
+
     const btnHtml = safeDownloadUrl
-        ? `<tr><td align="center" style="padding:0 40px 36px;">
-            <a href="${safeDownloadUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;text-decoration:none;border-radius:50px;font-weight:700;font-size:1rem;letter-spacing:0.3px;box-shadow:0 8px 32px rgba(139,92,246,0.45);">Скачать CraneApp →</a>
+        ? `<tr><td align="center" style="padding:4px 40px 40px;">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${safeDownloadUrl}" style="height:54px;v-text-anchor:middle;width:280px;" arcsize="50%" fillcolor="#8b3ff0">
+            <w:anchorlock/>
+            <center style="color:#ffffff;font-family:sans-serif;font-size:16px;font-weight:bold;">Скачать CraneApp →</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <a href="${safeDownloadUrl}" style="display:inline-block;padding:17px 44px;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#c084fc 100%);color:#ffffff;text-decoration:none;border-radius:50px;font-weight:700;font-size:1rem;letter-spacing:0.2px;box-shadow:0 10px 30px rgba(139,92,246,0.5),0 2px 6px rgba(139,92,246,0.3),inset 0 1px 0 rgba(255,255,255,0.25);">Скачать CraneApp →</a>
+            <!--<![endif]-->
            </td></tr>`
-        : '';
+        : `<tr><td style="padding:0 40px 12px;"></td></tr>`;
 
     return `<!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
   <title>CraneApp</title>
+  <!--[if mso]>
+  <style type="text/css">body, table, td {font-family: Arial, sans-serif !important;}</style>
+  <![endif]-->
 </head>
-<body style="margin:0;padding:0;background:#0d0b1e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;">
+<body style="margin:0;padding:0;background-color:#0a0817;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;">
 
-  <!-- Фоновый градиент (поддерживается Gmail, Apple Mail) -->
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(160deg,#0d0b1e 0%,#1a0a2e 40%,#0d0b1e 100%);min-height:100vh;">
-    <tr><td align="center" style="padding:48px 16px 48px;">
+  <!-- Preheader (скрытый превью-текст в инбоксе) -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+    CraneApp — ${safePlatform}: ${safeBody.replace(/<br>/g, ' ')}
+  </div>
 
-      <!-- Основная карточка -->
-      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;border-radius:28px;overflow:hidden;border:1px solid rgba(168,85,247,0.18);background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);box-shadow:0 32px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1);">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#0a0817;background-image:radial-gradient(circle at 20% 0%,rgba(124,58,237,0.35) 0%,transparent 45%),radial-gradient(circle at 85% 25%,rgba(168,85,247,0.22) 0%,transparent 50%),linear-gradient(165deg,#0a0817 0%,#170a2e 45%,#0a0817 100%);">
+    <tr><td align="center" style="padding:56px 16px;">
 
-        <!-- Шапка с логотипом -->
+      <!-- Логотип над карточкой -->
+      <table cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:28px;">
+        <tr><td align="center">
+          <table cellpadding="0" cellspacing="0" role="presentation" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:22px;box-shadow:0 8px 28px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);">
+            <tr><td style="padding:14px;">
+              <img src="${LOGO_URL}" width="56" height="56" alt="CraneApp" style="display:block;border-radius:14px;width:56px;height:56px;">
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+
+      <!-- Основная стеклянная карточка -->
+      <table width="560" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;width:100%;border-radius:32px;overflow:hidden;border:1px solid rgba(168,85,247,0.22);background-color:#150c28;background-image:linear-gradient(165deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.015) 55%,rgba(168,85,247,0.04) 100%);box-shadow:0 40px 90px rgba(0,0,0,0.65),0 1px 0 rgba(255,255,255,0.06) inset;">
+
+        <!-- Шапка -->
         <tr>
-          <td align="center" style="padding:40px 40px 32px;background:linear-gradient(135deg,rgba(124,58,237,0.5) 0%,rgba(168,85,247,0.3) 100%);border-bottom:1px solid rgba(168,85,247,0.2);">
-            <table cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding-right:10px;vertical-align:middle;">
-                  <!-- Иконка журавля -->
-                  <div style="width:44px;height:44px;background:rgba(255,255,255,0.12);border-radius:14px;border:1px solid rgba(255,255,255,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:24px;line-height:44px;text-align:center;">🦢</div>
-                </td>
-                <td style="vertical-align:middle;">
-                  <span style="font-size:1.6rem;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">CraneApp</span>
-                </td>
-              </tr>
+          <td align="center" style="padding:44px 40px 30px;background-image:linear-gradient(145deg,rgba(124,58,237,0.55) 0%,rgba(168,85,247,0.25) 60%,transparent 100%);border-bottom:1px solid rgba(255,255,255,0.08);">
+            <p style="margin:0;font-size:1.7rem;font-weight:800;color:#ffffff;letter-spacing:-0.6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">CraneApp</p>
+            <table cellpadding="0" cellspacing="0" role="presentation" style="margin:14px auto 0;">
+              <tr><td style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:50px;padding:5px 16px;">
+                <span style="font-size:0.72rem;color:rgba(255,255,255,0.65);letter-spacing:1.8px;text-transform:uppercase;font-weight:600;">✦ Уведомление о релизе</span>
+              </td></tr>
             </table>
-            <p style="margin:16px 0 0;font-size:0.9rem;color:rgba(255,255,255,0.55);letter-spacing:0.5px;text-transform:uppercase;">Уведомление о релизе</p>
           </td>
         </tr>
 
-        <!-- Платформа — стеклянный бейдж -->
+        <!-- Платформа -->
         <tr>
-          <td align="center" style="padding:32px 40px 0;">
-            <table cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.35);border-radius:50px;padding:8px 22px;">
-                  <span style="font-size:0.8rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:2px;">Платформа</span>
-                  <span style="font-size:1.05rem;font-weight:700;color:#d8b4fe;">${safePlatform}</span>
-                </td>
-              </tr>
+          <td align="center" style="padding:34px 40px 0;">
+            <table cellpadding="0" cellspacing="0" role="presentation">
+              <tr><td style="background-image:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(124,58,237,0.1));border:1px solid rgba(168,85,247,0.4);border-radius:18px;padding:14px 28px;box-shadow:0 4px 16px rgba(168,85,247,0.15) inset;">
+                <p style="margin:0 0 4px;font-size:0.7rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;font-weight:600;">Платформа</p>
+                <p style="margin:0;font-size:1.15rem;font-weight:700;color:#e3c9ff;letter-spacing:-0.2px;">${safePlatform}</p>
+              </td></tr>
             </table>
           </td>
         </tr>
 
         <!-- Разделитель -->
         <tr>
-          <td style="padding:28px 40px 0;">
-            <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.3),transparent);"></div>
+          <td style="padding:30px 40px 0;">
+            <div style="height:1px;background-image:linear-gradient(90deg,transparent,rgba(168,85,247,0.35),transparent);"></div>
           </td>
         </tr>
 
         <!-- Текст письма -->
         <tr>
-          <td style="padding:28px 40px 32px;">
-            <p style="margin:0;font-size:1rem;color:rgba(255,255,255,0.8);line-height:1.75;">${safeBody}</p>
+          <td style="padding:28px 44px 8px;">
+            <p style="margin:0;font-size:1.02rem;color:rgba(255,255,255,0.85);line-height:1.8;">${safeBody}</p>
           </td>
         </tr>
 
@@ -507,8 +531,8 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
 
         <!-- Футер -->
         <tr>
-          <td style="padding:24px 40px 32px;border-top:1px solid rgba(255,255,255,0.06);">
-            <p style="margin:0;font-size:0.78rem;color:rgba(255,255,255,0.2);text-align:center;line-height:1.6;">
+          <td style="padding:26px 40px 34px;border-top:1px solid rgba(255,255,255,0.07);">
+            <p style="margin:0;font-size:0.76rem;color:rgba(255,255,255,0.32);text-align:center;line-height:1.7;">
               Вы получили это письмо, так как подписались на уведомления на сайте CraneApp.<br>
               Если вы не хотите получать уведомления — просто проигнорируйте это письмо.
             </p>
@@ -518,7 +542,7 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
       </table>
 
       <!-- Подпись под карточкой -->
-      <p style="margin:24px 0 0;font-size:0.78rem;color:rgba(255,255,255,0.15);text-align:center;">
+      <p style="margin:26px 0 0;font-size:0.76rem;color:rgba(255,255,255,0.22);text-align:center;letter-spacing:0.2px;">
         © 2026 CraneApp · craneapp.ru
       </p>
 
