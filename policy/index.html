@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030014">
+    <title>Политика конфиденциальности — CraneApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap');
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 110px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geologica', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: -0.3px;
+            line-height: 1.75;
+
+            background-color: #030014;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(219, 39, 119, 0.2) 0%, transparent 40%);
+            background-attachment: fixed;
+            background-size: 130% 130%;
+            animation: backgroundGlow 16s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundGlow {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 50% 100%; }
+        }
+
+        a { color: inherit; }
+
+        /* ---------- Header ---------- */
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 6%;
+            margin: 20px auto;
+            max-width: 88%;
+            border-radius: 24px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.25s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(168, 85, 247, 0.18);
+            border-color: rgba(168, 85, 247, 0.4);
+            color: #fff;
+        }
+
+        /* ---------- Hero ---------- */
+        .hero-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 24px 30px;
+            text-align: center;
+        }
+
+        .hero-wrap h1 {
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-wrap .subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 400;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 22px;
+            padding: 8px 18px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+        }
+
+        .meta-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a855f7;
+            box-shadow: 0 0 8px #a855f7;
+        }
+
+        /* ---------- Layout ---------- */
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 24px 80px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* Side nav */
+        .side-nav {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 110px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            padding: 22px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .side-nav::-webkit-scrollbar { width: 4px; }
+        .side-nav::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 4px; }
+
+        .side-nav-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .side-nav ul { list-style: none; }
+        .side-nav li { margin-bottom: 3px; }
+
+        .side-nav a {
+            display: block;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.86rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .side-nav a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .side-nav li.active > a {
+            color: #d8b4fe;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Content card */
+        .content-card {
+            flex: 1;
+            min-width: 0;
+            padding: 48px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+        }
+
+        section { margin-bottom: 44px; scroll-margin-top: 110px; }
+        section:last-child { margin-bottom: 0; }
+
+        section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        section h2 .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            font-size: 0.92rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+        }
+
+        section h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 22px 0 10px;
+            color: #e3c9ff;
+        }
+
+        section p {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.98rem;
+            margin-bottom: 14px;
+        }
+
+        section ul {
+            margin: 12px 0 16px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        section ul li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.96rem;
+        }
+
+        section ul li::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 9px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a855f7;
+        }
+
+        .highlight-box {
+            margin: 18px 0;
+            padding: 20px 24px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(124, 58, 237, 0.06));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.93rem;
+        }
+
+        .highlight-box.note {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.04));
+            border-color: rgba(59, 130, 246, 0.28);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            margin: 40px 0;
+        }
+
+        .contact-card {
+            margin-top: 8px;
+            padding: 22px 26px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-card p { margin-bottom: 6px; font-size: 0.93rem; }
+        .contact-card a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
+        .contact-card a:hover { text-decoration: underline; }
+
+        /* ---------- Footer ---------- */
+        .footer {
+            text-align: center;
+            padding: 30px 24px 50px;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Scroll to top */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.5);
+            z-index: 200;
+        }
+
+        .scroll-top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scroll-top-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 28px rgba(168, 85, 247, 0.65);
+        }
+
+        .scroll-top-btn .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 9px solid #fff;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 900px) {
+            .page-wrap { flex-direction: column; }
+            .side-nav {
+                width: 100%;
+                position: static;
+                max-height: none;
+            }
+            .content-card { padding: 30px 22px; }
+        }
+
+        @media (max-width: 600px) {
+            .site-header { padding: 12px 5%; margin: 12px auto; max-width: 92%; }
+            .logo-text { font-size: 1.1rem; }
+            .back-link span.label { display: none; }
+            .hero-wrap { padding: 36px 18px 20px; }
+            section h2 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="logo-container">
+            <img src="images/craneapp-circle.png" alt="CraneApp">
+            <span class="logo-text">CraneApp</span>
+        </a>
+        <a href="index.html" class="back-link">
+            <span>←</span>
+            <span class="label">На главную</span>
+        </a>
+    </header>
+
+    <div class="hero-wrap">
+        <h1>Политика конфиденциальности</h1>
+        <p class="subtitle">Как CraneApp относится к вашим данным</p>
+        <div class="meta-pill">
+            <span class="dot"></span>
+            Действует с 2026 года
+        </div>
+    </div>
+
+    <div class="page-wrap">
+
+        <nav class="side-nav">
+            <div class="side-nav-title">Содержание</div>
+            <ul>
+                <li><a href="#1">1. Общие положения</a></li>
+                <li><a href="#2">2. Какие данные мы собираем</a></li>
+                <li><a href="#3">3. Зачем нам эти данные</a></li>
+                <li><a href="#4">4. Сообщения и переписка</a></li>
+                <li><a href="#5">5. Сторонние сервисы</a></li>
+                <li><a href="#6">6. Хранение и сроки</a></li>
+                <li><a href="#7">7. Ваши права</a></li>
+                <li><a href="#8">8. Удаление аккаунта</a></li>
+                <li><a href="#9">9. Безопасность</a></li>
+                <li><a href="#10">10. Дети и несовершеннолетние</a></li>
+                <li><a href="#11">11. Изменения политики</a></li>
+                <li><a href="#12">12. Контакты</a></li>
+            </ul>
+        </nav>
+
+        <div class="content-card">
+
+            <section id="1">
+                <h2><span class="num">1</span>Общие положения</h2>
+                <p>Настоящая Политика конфиденциальности описывает, какие данные собирает приложение и сайт CraneApp (далее — «Сервис»), как они используются и какими правами вы обладаете в отношении своих данных.</p>
+                <p>CraneApp находится в стадии активной разработки. Мы стараемся придерживаться принципа минимизации данных: собирать только то, что действительно необходимо для работы Сервиса, и не больше.</p>
+                <div class="highlight-box note">
+                    <p>CraneApp в настоящий момент не зарегистрирован как юридическое лицо. Это означает, что на данном этапе мы не можем предоставить формальные юридические гарантии, предусмотренные законодательством о защите персональных данных (например, GDPR или 152-ФЗ) в полном объёме. Мы планируем обновить этот раздел по мере развития проекта.</p>
+                </div>
+            </section>
+
+            <section id="2">
+                <h2><span class="num">2</span>Какие данные мы собираем</h2>
+                <p>Мы придерживаемся принципа минимального сбора данных и запрашиваем только то, что необходимо для регистрации, авторизации и базовой работы Сервиса:</p>
+                <ul>
+                    <li>Адрес электронной почты — используется для регистрации аккаунта, авторизации и (при вашем согласии) уведомлений о релизах и важных обновлениях;</li>
+                    <li>Учётные данные — пароль хранится в виде хэша, мы не имеем доступа к паролю в исходном виде;</li>
+                    <li>Базовые технические данные — IP-адрес и тип устройства/браузера могут временно фиксироваться для обеспечения безопасности и защиты от автоматических атак и спам-ботов (например, при заполнении форм на сайте);</li>
+                    <li>Данные профиля, которые вы добавляете самостоятельно — отображаемое имя и (опционально) аватар, если эти функции доступны в текущей версии приложения.</li>
+                </ul>
+                <p>Мы не запрашиваем номер телефона, паспортные данные или доступ к адресной книге устройства для базовой регистрации.</p>
+            </section>
+
+            <section id="3">
+                <h2><span class="num">3</span>Зачем нам эти данные</h2>
+                <p>Собранные данные используются исключительно для следующих целей:</p>
+                <ul>
+                    <li>Создание и поддержание работы вашего аккаунта;</li>
+                    <li>Авторизация и защита аккаунта от несанкционированного доступа;</li>
+                    <li>Отправка уведомлений о релизе и важных изменениях в Сервисе — только если вы самостоятельно подписались на рассылку;</li>
+                    <li>Защита сайта и форм от спама и автоматических ботов;</li>
+                    <li>Базовая диагностика и устранение технических неполадок.</li>
+                </ul>
+                <p>Мы не продаём, не сдаём в аренду и не передаём ваши данные третьим лицам в рекламных или маркетинговых целях.</p>
+            </section>
+
+            <section id="4">
+                <h2><span class="num">4</span>Сообщения и переписка</h2>
+                <p>CraneApp находится в стадии разработки, и архитектура хранения и обработки сообщений может изменяться по мере развития продукта. Мы стремимся обеспечить максимальный уровень конфиденциальности переписки пользователей.</p>
+                <div class="highlight-box">
+                    <p>Точные технические детали (включая используемые протоколы шифрования) будут описаны в этом разделе по мере финализации архитектуры мессенджера. Если для вас критично знать эти детали уже сейчас — напишите нам, мы постараемся ответить честно и по существу.</p>
+                </div>
+            </section>
+
+            <section id="5">
+                <h2><span class="num">5</span>Сторонние сервисы</h2>
+                <p>Для работы некоторых функций сайта и Сервиса мы используем сторонние технические сервисы. Они получают минимально необходимый объём данных для выполнения своей задачи:</p>
+                <h3>Отправка писем</h3>
+                <p>Для отправки email-уведомлений (например, об успешной подписке или релизе) мы используем стороннего почтового провайдера. Ему передаётся только ваш email и текст письма — необходимые для доставки сообщения.</p>
+                <h3>Защита от спама</h3>
+                <p>Для защиты форм на сайте (например, формы подписки) от автоматических ботов используется сервис проверки reCAPTCHA от Google. Он может обрабатывать технические данные вашего браузера в соответствии со своей собственной политикой конфиденциальности.</p>
+                <h3>Хостинг и инфраструктура</h3>
+                <p>Сайт и серверная часть размещены на сторонних облачных платформах (хостинг-провайдерах), которые могут технически обрабатывать стандартные данные запросов (IP-адрес, время запроса) в рамках обеспечения работы инфраструктуры.</p>
+            </section>
+
+            <section id="6">
+                <h2><span class="num">6</span>Хранение и сроки</h2>
+                <p>Данные аккаунта хранятся до тех пор, пока вы пользуетесь Сервисом или пока не запросите удаление аккаунта.</p>
+                <p>Технические логи (например, для защиты от спама и атак) хранятся ограниченный срок и автоматически удаляются или перезаписываются по истечении этого периода.</p>
+                <p>Email из списка подписки на уведомления хранится до тех пор, пока вы не отпишетесь или не попросите удалить его — это можно сделать, написав нам напрямую.</p>
+            </section>
+
+            <section id="7">
+                <h2><span class="num">7</span>Ваши права</h2>
+                <p>Вне зависимости от текущего юридического статуса проекта, мы стараемся уважать следующие права пользователей:</p>
+                <ul>
+                    <li>Право узнать, какие данные о вас хранятся;</li>
+                    <li>Право запросить исправление неточных данных;</li>
+                    <li>Право запросить удаление своих данных и аккаунта;</li>
+                    <li>Право отписаться от email-рассылки в любой момент.</li>
+                </ul>
+                <p>Для реализации любого из этих прав свяжитесь с нами по контактам, указанным в разделе 12.</p>
+            </section>
+
+            <section id="8">
+                <h2><span class="num">8</span>Удаление аккаунта</h2>
+                <p>Вы можете запросить удаление своего аккаунта и связанных с ним данных, написав нам напрямую. Мы обязуемся удалить данные в разумный срок, за исключением случаев, когда хранение требуется по техническим причинам (например, резервные копии инфраструктуры, которые перезаписываются автоматически в течение ограниченного времени).</p>
+                <p>Функция самостоятельного удаления аккаунта внутри приложения может быть добавлена в будущих версиях Сервиса.</p>
+            </section>
+
+            <section id="9">
+                <h2><span class="num">9</span>Безопасность</h2>
+                <p>Мы принимаем разумные технические меры для защиты ваших данных: пароли хранятся в виде хэшей, доступ к серверной инфраструктуре ограничен, формы защищены от автоматических атак.</p>
+                <p>Тем не менее, поскольку CraneApp — развивающийся проект, мы не можем гарантировать абсолютную защиту от всех возможных угроз. Если вы обнаружите уязвимость, пожалуйста, сообщите нам — мы будем благодарны за обратную связь.</p>
+            </section>
+
+            <section id="10">
+                <h2><span class="num">10</span>Дети и несовершеннолетние</h2>
+                <p>Сервис не предназначен для лиц младше 13 лет. Мы не собираем намеренно данные детей младше этого возраста. Если вы являетесь родителем или законным представителем и считаете, что ваш ребёнок предоставил нам данные, свяжитесь с нами для их удаления.</p>
+            </section>
+
+            <section id="11">
+                <h2><span class="num">11</span>Изменения политики</h2>
+                <p>Мы можем обновлять эту Политику по мере развития Сервиса — особенно в части архитектуры мессенджера и обработки сообщений. Актуальная версия всегда доступна на этой странице. Мы рекомендуем периодически её просматривать.</p>
+                <p>Дата последнего обновления указывается в шапке страницы.</p>
+            </section>
+
+            <section id="12">
+                <h2><span class="num">12</span>Контакты</h2>
+                <p>Если у вас есть вопросы по этой Политике, по обработке ваших данных, или вы хотите запросить удаление аккаунта — напишите нам.</p>
+                <div class="contact-card">
+                    <p>📧 Email: <a href="mailto:craneapp.help@gmail.com">craneapp.help@gmail.com</a></p>
+                    <p>🌐 Сайт: <a href="https://craneapp.ru">craneapp.ru</a></p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <button class="scroll-top-btn" id="scroll-to-top" aria-label="Наверх">
+        <span class="arrow-up"></span>
+    </button>
+
+    <div class="footer">
+        © 2026 CraneApp. Документ может обновляться по мере развития проекта.
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('section');
+        const navLi = document.querySelectorAll('.side-nav ul li');
+        const scrollBtn = document.getElementById('scroll-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+
+            let current = '';
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 140) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLi.forEach((li) => {
+                li.classList.remove('active');
+                const link = li.querySelector('a').getAttribute('href').substring(1);
+                if (current === link) {
+                    li.classList.add('active');
+                }
+            });
+        });
+
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+
+</body>
+</html>
