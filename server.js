@@ -395,6 +395,32 @@ app.post('/api/admin/subscribers', async (req, res) => {
     }
 });
 
+app.post('/api/admin/subscribers/delete', async (req, res) => {
+    try {
+        const { sessionToken, email } = req.body;
+        const username = await validateSession(sessionToken);
+
+        if (!username) {
+            return res.status(403).json({ success: false, message: 'Ошибка доступа: сессия не валидна!' });
+        }
+
+        if (!email || typeof email !== 'string') {
+            return res.status(400).json({ success: false, message: 'Email не указан' });
+        }
+
+        const removed = await kv.srem(SUBSCRIBERS_KEY, email.trim().toLowerCase());
+
+        if (!removed) {
+            return res.status(404).json({ success: false, message: 'Подписчик не найден' });
+        }
+
+        res.json({ success: true, message: 'Подписчик удалён' });
+    } catch (err) {
+        console.error('Ошибка удаления подписчика:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
 // -----------------------------------------------------------------------
 // Routes: admin email blast
 // -----------------------------------------------------------------------

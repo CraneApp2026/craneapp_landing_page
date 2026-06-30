@@ -407,7 +407,20 @@
                     listEl.innerHTML = '';
                     data.subscribers.forEach(email => {
                         const row = document.createElement('div');
-                        row.textContent = email;
+                        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:4px 0;gap:10px;';
+
+                        const emailSpan = document.createElement('span');
+                        emailSpan.textContent = email;
+                        emailSpan.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+
+                        const delBtn = document.createElement('button');
+                        delBtn.textContent = '✕';
+                        delBtn.title = 'Удалить подписчика';
+                        delBtn.style.cssText = 'flex-shrink:0;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:6px;width:24px;height:24px;line-height:1;cursor:pointer;font-size:13px;';
+                        delBtn.onclick = () => deleteSubscriber(email, row);
+
+                        row.appendChild(emailSpan);
+                        row.appendChild(delBtn);
                         listEl.appendChild(row);
                     });
                 } else {
@@ -416,6 +429,49 @@
             })
             .catch(() => {
                 listEl.innerHTML = '<span style="color: #ef4444;">❌ Ошибка соединения</span>';
+            });
+        }
+
+        function deleteSubscriber(email, rowEl) {
+            openModal({
+                icon: '🗑️',
+                title: 'Удалить подписчика?',
+                text: `Письма больше не будут приходить на ${email}`,
+                showCancel: true,
+                onConfirm: () => {
+                    rowEl.style.opacity = '0.5';
+
+                    fetch(BACKEND_URL + '/api/admin/subscribers/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sessionToken: globalSessionToken, email })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            rowEl.remove();
+                            const valEl = document.getElementById('subscribers-val');
+                            valEl.innerText = Math.max(0, (parseInt(valEl.innerText, 10) || 1) - 1);
+                        } else {
+                            rowEl.style.opacity = '1';
+                            openModal({
+                                icon: '❌',
+                                title: 'Не получилось',
+                                text: data.message || 'Не удалось удалить подписчика',
+                                showCancel: false
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        rowEl.style.opacity = '1';
+                        openModal({
+                            icon: '❌',
+                            title: 'Ошибка соединения',
+                            text: 'Проверьте подключение и попробуйте снова',
+                            showCancel: false
+                        });
+                    });
+                }
             });
         }
 
