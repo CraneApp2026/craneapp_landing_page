@@ -432,6 +432,7 @@ const RESEND_BATCH_SIZE = 100;
 // Хелпер: генерирует HTML-тело письма о релизе
 function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
     const safePlatform = platform.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeSubject = subject.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeBody = body.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     const safeDownloadUrl = downloadUrl ? downloadUrl.replace(/"/g, '%22') : '';
 
@@ -491,13 +492,13 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
     CraneApp — ${safePlatform}: ${safeBody.replace(/<br>/g, ' ')}
   </div>
 
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#0a0817;background-image:radial-gradient(circle at 15% -5%,rgba(139,63,240,0.4) 0%,transparent 42%),radial-gradient(circle at 90% 15%,rgba(192,132,252,0.25) 0%,transparent 45%),radial-gradient(circle at 50% 100%,rgba(124,58,237,0.18) 0%,transparent 50%),linear-gradient(165deg,#0a0817 0%,#190b32 45%,#0a0817 100%);">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#050309;background-image:radial-gradient(circle at 12% -8%,rgba(168,85,247,0.5) 0%,transparent 40%),radial-gradient(circle at 92% 10%,rgba(124,58,237,0.32) 0%,transparent 45%),radial-gradient(circle at 50% 105%,rgba(192,132,252,0.2) 0%,transparent 55%),linear-gradient(165deg,#050309 0%,#160a2e 45%,#050309 100%);">
     <tr><td align="center" style="padding:60px 16px;">
 
       <!-- Логотип с мягким свечением -->
       <table cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:30px;">
         <tr><td align="center">
-          <table cellpadding="0" cellspacing="0" role="presentation" style="background-color:rgba(255,255,255,0.07);background-image:linear-gradient(160deg,rgba(255,255,255,0.14),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.16);border-radius:24px;box-shadow:0 0 0 8px rgba(168,85,247,0.06),0 10px 32px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.18);">
+          <table cellpadding="0" cellspacing="0" role="presentation" style="background-color:rgba(255,255,255,0.08);background-image:linear-gradient(160deg,rgba(255,255,255,0.22),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.22);border-radius:26px;box-shadow:0 0 0 9px rgba(168,85,247,0.07),0 14px 36px rgba(124,58,237,0.4),inset 0 1px 0 rgba(255,255,255,0.28);">
             <tr><td style="padding:15px;">
               <img src="${LOGO_URL}" width="58" height="58" alt="CraneApp" style="display:block;border-radius:15px;width:58px;height:58px;">
             </td></tr>
@@ -505,16 +506,21 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
         </td></tr>
       </table>
 
-      <!-- Основная стеклянная карточка -->
-      <table class="ca-card" width="560" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;width:100%;border-radius:34px;overflow:hidden;border:1px solid rgba(168,85,247,0.24);background-color:#150c28;background-image:linear-gradient(168deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.015) 50%,rgba(168,85,247,0.05) 100%);box-shadow:0 44px 100px rgba(0,0,0,0.7),0 1px 0 rgba(255,255,255,0.07) inset;">
+      <!-- Основная стеклянная карточка (liquid glass) -->
+      <table class="ca-card" width="560" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;width:100%;border-radius:42px;overflow:hidden;border:1px solid rgba(255,255,255,0.14);background-color:#120a24;background-image:linear-gradient(170deg,rgba(255,255,255,0.13) 0%,rgba(255,255,255,0.02) 18%,rgba(255,255,255,0.015) 55%,rgba(168,85,247,0.08) 100%);box-shadow:0 50px 110px rgba(0,0,0,0.78),0 1px 0 rgba(255,255,255,0.1) inset,0 0 0 1px rgba(168,85,247,0.06) inset;">
+
+        <!-- Глянцевый блик сверху -->
+        <tr>
+          <td style="height:3px;background-image:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);"></td>
+        </tr>
 
         <!-- Шапка -->
         <tr>
-          <td align="center" class="ca-pad" style="padding:46px 40px 32px;background-color:rgba(124,58,237,0.18);background-image:linear-gradient(150deg,rgba(124,58,237,0.6) 0%,rgba(168,85,247,0.28) 55%,transparent 100%);border-bottom:1px solid rgba(255,255,255,0.09);">
+          <td align="center" class="ca-pad" style="padding:46px 40px 32px;background-color:rgba(124,58,237,0.2);background-image:linear-gradient(150deg,rgba(124,58,237,0.65) 0%,rgba(168,85,247,0.3) 50%,transparent 100%);border-bottom:1px solid rgba(255,255,255,0.1);">
             <p style="margin:0;font-family:${FONT_STACK};font-size:1.85rem;font-weight:700;color:#ffffff;letter-spacing:-0.8px;">CraneApp</p>
             <table cellpadding="0" cellspacing="0" role="presentation" style="margin:16px auto 0;">
-              <tr><td style="background-color:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:50px;padding:6px 18px;">
-                <span style="font-family:${FONT_STACK};font-size:0.7rem;color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;font-weight:600;">✦ Уведомление о релизе</span>
+              <tr><td style="background-color:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50px;padding:6px 18px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2);">
+                <span style="font-family:${FONT_STACK};font-size:0.7rem;color:rgba(255,255,255,0.75);letter-spacing:2px;text-transform:uppercase;font-weight:600;">✦ Уведомление о релизе</span>
               </td></tr>
             </table>
           </td>
@@ -524,9 +530,9 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
         <tr>
           <td align="center" class="ca-pad" style="padding:36px 40px 0;">
             <table cellpadding="0" cellspacing="0" role="presentation">
-              <tr><td style="background-color:rgba(168,85,247,0.12);background-image:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(124,58,237,0.08));border:1px solid rgba(168,85,247,0.42);border-radius:20px;padding:15px 30px;box-shadow:0 4px 18px rgba(168,85,247,0.18) inset;">
-                <p style="margin:0 0 5px;font-family:${FONT_STACK};font-size:0.68rem;color:rgba(255,255,255,0.48);text-transform:uppercase;letter-spacing:2.2px;font-weight:600;">Платформа</p>
-                <p style="margin:0;font-family:${FONT_STACK};font-size:1.2rem;font-weight:700;color:#e7cfff;letter-spacing:-0.3px;">${safePlatform}</p>
+              <tr><td style="background-color:rgba(168,85,247,0.14);background-image:linear-gradient(140deg,rgba(255,255,255,0.14),rgba(168,85,247,0.22) 40%,rgba(124,58,237,0.1));border:1px solid rgba(168,85,247,0.45);border-radius:22px;padding:15px 30px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.25),0 4px 18px rgba(168,85,247,0.2);">
+                <p style="margin:0 0 5px;font-family:${FONT_STACK};font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:2.2px;font-weight:600;">Платформа</p>
+                <p style="margin:0;font-family:${FONT_STACK};font-size:1.2rem;font-weight:700;color:#f1e2ff;letter-spacing:-0.3px;">${safePlatform}</p>
               </td></tr>
             </table>
           </td>
@@ -539,9 +545,20 @@ function buildReleaseEmailHtml({ platform, subject, body, downloadUrl }) {
           </td>
         </tr>
 
+        <!-- Тема письма -->
+        <tr>
+          <td align="center" class="ca-pad" style="padding:30px 40px 0;">
+            <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+              <tr><td align="center" style="background-color:rgba(255,255,255,0.06);background-image:linear-gradient(155deg,rgba(255,255,255,0.16) 0%,rgba(255,255,255,0.02) 55%,rgba(168,85,247,0.1) 100%);border:1px solid rgba(255,255,255,0.18);border-radius:24px;padding:22px 30px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.2),0 10px 28px rgba(124,58,237,0.16);">
+                <p style="margin:0;font-family:${FONT_STACK};font-weight:700;font-size:1.32rem;letter-spacing:-0.5px;line-height:1.4;color:#ffffff;">${safeSubject}</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+
         <!-- Текст письма -->
         <tr>
-          <td class="ca-pad" style="padding:30px 46px 8px;">
+          <td class="ca-pad" style="padding:28px 46px 8px;">
             <p style="margin:0;font-family:${FONT_STACK};font-weight:400;font-size:1.04rem;color:rgba(255,255,255,0.87);line-height:1.85;">${safeBody}</p>
           </td>
         </tr>
